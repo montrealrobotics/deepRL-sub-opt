@@ -43,7 +43,7 @@ class Args:
     # Algorithm specific arguments
     env_id: str = "MinAtar/SpaceInvaders-v0"
     """the id of the environment"""
-    total_timesteps: int = 500000
+    total_timesteps: int = 5000000
     """total timesteps of the experiments"""
     learning_rate: float = 2.5e-4
     """the learning rate of the optimizer"""
@@ -144,7 +144,7 @@ poetry run pip install "stable_baselines3==2.0.0a1"
     np.random.seed(args.seed)
     torch.manual_seed(args.seed)
     torch.backends.cudnn.deterministic = args.torch_deterministic
-
+    max_return = -1000000000
     device = torch.device("cuda" if torch.cuda.is_available() and args.cuda else "cpu")
 
     # env setup
@@ -185,7 +185,10 @@ poetry run pip install "stable_baselines3==2.0.0a1"
         if "final_info" in infos:
             for info in infos["final_info"]:
                 if info and "episode" in info:
-                    print(f"global_step={global_step}, episodic_return={info['episode']['r']}")
+                    if info["episode"]["r"] > max_return:
+                        max_return = info["episode"]["r"]
+                    writer.add_scalar("charts/best_trajectory_return", max_return, global_step)
+                    print(f"global_step={global_step}, episodic_return={info['episode']['r']}, best_return={max_return}")
                     writer.add_scalar("charts/episodic_return", info["episode"]["r"], global_step)
                     writer.add_scalar("charts/episodic_length", info["episode"]["l"], global_step)
 
