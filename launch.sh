@@ -12,7 +12,7 @@
 
 
 module load cudatoolkit/12.1 miniconda/3
-conda activate clearnrl
+conda activate cleanrl
 
 python cleanrl/dqn.py --seed 1 --env-id MinAtar/SpaceInvaders-v0 --track --wandb-project-name sub-optimality
 python cleanrl/dqn.py --seed 2 --env-id MinAtar/SpaceInvaders-v0 --track --wandb-project-name sub-optimality
