@@ -49,7 +49,7 @@ class Args:
     """the learning rate of the optimizer"""
     num_envs: int = 1
     """the number of parallel game environments"""
-    buffer_size: int = 10000
+    buffer_size: int = 100000
     """the replay memory buffer size"""
     gamma: float = 0.99
     """the discount factor gamma"""
@@ -217,6 +217,10 @@ poetry run pip install "stable_baselines3==2.0.0a1"
                     writer.add_scalar("losses/q_values", old_val.mean().item(), global_step)
                     print("SPS:", int(global_step / (time.time() - start_time)))
                     writer.add_scalar("charts/SPS", int(global_step / (time.time() - start_time)), global_step)
+                    data_ = rb.sample(10000)
+                    if global_step % 1000 == 0 and data_.rewards.shape[0] >= 10000:
+                        writer.add_scalar("charts/data mean", data_.rewards.mean(), global_step)
+                        writer.add_scalar("charts/data top 95%", torch.mean(torch.topk(data_.rewards.flatten(), 500)[0]), global_step)
 
                 # optimize the model
                 optimizer.zero_grad()
