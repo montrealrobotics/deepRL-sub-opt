@@ -11,6 +11,7 @@ conda activate cleanrl
 
 python cleanrl/dqn.py --seed $SLURM_ARRAY_TASK_ID --env-id MinAtar/SpaceInvaders-v0 --track --wandb-project-name sub-optimality
 python cleanrl/dqn.py --seed $SLURM_ARRAY_TASK_ID --env-id MinAtar/Asterix-v0 --track --wandb-project-name sub-optimality
+python cleanrl/dqn.py --seed $SLURM_ARRAY_TASK_ID --env-id LunarLander-v2 --track --wandb-project-name sub-optimality
 
-python cleanrl/ppo.py --seed $SLURM_ARRAY_TASK_ID --env-id MinAtar/SpaceInvaders-v0 --track --wandb-project-name sub-optimality
-python cleanrl/ppo.py --seed $SLURM_ARRAY_TASK_ID --env-id MinAtar/Asterix-v0 --track --wandb-project-name sub-optimality
+# python cleanrl/ppo.py --seed $SLURM_ARRAY_TASK_ID --env-id MinAtar/SpaceInvaders-v0 --track --wandb-project-name sub-optimality
+# python cleanrl/ppo.py --seed $SLURM_ARRAY_TASK_ID --env-id MinAtar/Asterix-v0 --track --wandb-project-name sub-optimality

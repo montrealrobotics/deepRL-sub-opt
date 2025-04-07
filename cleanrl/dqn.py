@@ -197,6 +197,7 @@ poetry run pip install "stable_baselines3==2.0.0a1"
                         heapq.heapreplace(max_returns, info["episode"]["r"])
                     writer.add_scalar("charts/best_trajectory_return", max_return, global_step)
                     writer.add_scalar("charts/avg_top_10_returns", np.mean(list(max_returns)), global_step)
+                    writer.add_scalar("charts/online_optimality_gap", np.mean(list(max_returns)) - info["episode"]["r"], global_step)
                     print(f"global_step={global_step}, episodic_return={info['episode']['r']}, best_return={max_return}")
                     writer.add_scalar("charts/episodic_return", info["episode"]["r"], global_step)
                     writer.add_scalar("charts/episodic_length", info["episode"]["l"], global_step)
