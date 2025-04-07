@@ -13,7 +13,7 @@ import torch.optim as optim
 import tyro
 from stable_baselines3.common.buffers import ReplayBuffer
 from torch.utils.tensorboard import SummaryWriter
-
+import heapq
 
 @dataclass
 class Args:
@@ -144,7 +144,9 @@ poetry run pip install "stable_baselines3==2.0.0a1"
     np.random.seed(args.seed)
     torch.manual_seed(args.seed)
     torch.backends.cudnn.deterministic = args.torch_deterministic
-    max_return = -1000000000
+    max_return = -100000
+    ## max_returns is a list of the top 10 episodic returns
+    max_returns = []
     device = torch.device("cuda" if torch.cuda.is_available() and args.cuda else "cpu")
 
     # env setup
@@ -187,7 +189,14 @@ poetry run pip install "stable_baselines3==2.0.0a1"
                 if info and "episode" in info:
                     if info["episode"]["r"] > max_return:
                         max_return = info["episode"]["r"]
+                    if len(max_returns) == 0:
+                        max_returns = [info["episode"]["r"] for _ in range(10)]
+                        heapq.heapify(max_returns)
+                    if len(max_returns) > 0 and info["episode"]["r"] > min(max_returns):
+                        ## Repalce the minimum value in max_returns with the new episodic return
+                        heapq.heapreplace(max_returns, info["episode"]["r"])
                     writer.add_scalar("charts/best_trajectory_return", max_return, global_step)
+                    writer.add_scalar("charts/avg_top_10_returns", np.mean(list(max_returns)), global_step)
                     print(f"global_step={global_step}, episodic_return={info['episode']['r']}, best_return={max_return}")
                     writer.add_scalar("charts/episodic_return", info["episode"]["r"], global_step)
                     writer.add_scalar("charts/episodic_length", info["episode"]["l"], global_step)
@@ -219,8 +228,9 @@ poetry run pip install "stable_baselines3==2.0.0a1"
                     writer.add_scalar("charts/SPS", int(global_step / (time.time() - start_time)), global_step)
                     data_ = rb.sample(10000)
                     if global_step % 1000 == 0 and data_.rewards.shape[0] >= 10000:
-                        writer.add_scalar("charts/data mean", data_.rewards.mean(), global_step)
-                        writer.add_scalar("charts/data top 95%", torch.mean(torch.topk(data_.rewards.flatten(), 500)[0]), global_step)
+                        writer.add_scalar("charts/rewards mean", data_.rewards.mean(), global_step)
+                        writer.add_scalar("charts/rewards top 95%", torch.mean(torch.topk(data_.rewards.flatten(), 500)[0]), global_step)
+                        # writer.add_scalar("charts/returns top 95%", torch.mean(torch.topk(data_.returns.flatten(), 500)[0]), global_step)
 
                 # optimize the model
                 optimizer.zero_grad()
