@@ -43,7 +43,7 @@ class Args:
     # Algorithm specific arguments
     env_id: str = "MinAtar/SpaceInvaders-v0"
     """the id of the environment"""
-    total_timesteps: int = 5000000
+    total_timesteps: int = 10000000
     """total timesteps of the experiments"""
     learning_rate: float = 2.5e-4
     """the learning rate of the optimizer"""
