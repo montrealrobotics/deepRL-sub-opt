@@ -17,4 +17,5 @@ python cleanrl/dqn.py --seed $SLURM_ARRAY_TASK_ID --env-id MinAtar/SpaceInvaders
 # python cleanrl/ppo.py --seed $SLURM_ARRAY_TASK_ID --env-id MinAtar/SpaceInvaders-v0 --track --wandb-project-name sub-optimality
 # python cleanrl/ppo.py --seed $SLURM_ARRAY_TASK_ID --env-id MinAtar/Asterix-v0 --track --wandb-project-name sub-optimality
 
-# python cleanrl/ppo_continuous_action.py --seed $SLURM_ARRAY_TASK_ID --env-id MinAtar/Asterix-v0 --track --wandb-project-name sub-optimality
+# python cleanrl/ppo_continuous_action.py --seed $SLURM_ARRAY_TASK_ID --env-id Walker2d-v4 --track --wandb-project-name sub-optimality
+# python cleanrl/ppo_continuous_action.py --seed $SLURM_ARRAY_TASK_ID --env-id HalfCheetah-v4 --track --wandb-project-name sub-optimality
