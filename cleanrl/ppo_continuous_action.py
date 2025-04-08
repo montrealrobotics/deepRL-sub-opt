@@ -12,6 +12,7 @@ import torch.optim as optim
 import tyro
 from torch.distributions.normal import Normal
 from torch.utils.tensorboard import SummaryWriter
+import heapq
 
 
 @dataclass
@@ -22,7 +23,7 @@ class Args:
     """seed of the experiment"""
     torch_deterministic: bool = True
     """if toggled, `torch.backends.cudnn.deterministic=False`"""
-    cuda: bool = True
+    cuda: bool = False
     """if toggled, cuda will be enabled by default"""
     track: bool = False
     """if toggled, this experiment will be tracked with Weights and Biases"""
@@ -170,6 +171,9 @@ if __name__ == "__main__":
     np.random.seed(args.seed)
     torch.manual_seed(args.seed)
     torch.backends.cudnn.deterministic = args.torch_deterministic
+    max_return = -100000
+    ## max_returns is a list of the top 10 episodic returns
+    max_returns = []
 
     device = torch.device("cuda" if torch.cuda.is_available() and args.cuda else "cpu")
 
@@ -228,6 +232,17 @@ if __name__ == "__main__":
                         print(f"global_step={global_step}, episodic_return={info['episode']['r']}")
                         writer.add_scalar("charts/episodic_return", info["episode"]["r"], global_step)
                         writer.add_scalar("charts/episodic_length", info["episode"]["l"], global_step)
+                        if info["episode"]["r"] > max_return:
+                            max_return = info["episode"]["r"]
+                        if len(max_returns) == 0:
+                            max_returns = [info["episode"]["r"] for _ in range(10)]
+                            heapq.heapify(max_returns)
+                        if len(max_returns) > 0 and info["episode"]["r"] > min(max_returns):
+                            ## Repalce the minimum value in max_returns with the new episodic return
+                            heapq.heapreplace(max_returns, info["episode"]["r"])
+                        writer.add_scalar("charts/best_trajectory_return", max_return, global_step)
+                        writer.add_scalar("charts/avg_top_10_returns", np.mean(list(max_returns)), global_step)
+                        writer.add_scalar("charts/online_optimality_gap", np.mean(list(max_returns)) - info["episode"]["r"], global_step)
 
         # bootstrap value if not done
         with torch.no_grad():
