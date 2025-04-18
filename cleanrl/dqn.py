@@ -15,6 +15,12 @@ from stable_baselines3.common.buffers import ReplayBuffer
 from torch.utils.tensorboard import SummaryWriter
 import heapq
 
+# ===================== load the reward module ===================== #
+import sys
+sys.path.append("../")
+from rllte.xplore.reward import RND
+# ===================== load the reward module ===================== #
+
 @dataclass
 class Args:
     exp_name: str = os.path.basename(__file__)[: -len(".py")]
@@ -69,6 +75,10 @@ class Args:
     """timestep to start learning"""
     train_frequency: int = 10
     """the frequency of training"""
+    intrinsic_rewards: bool = True
+    """Whether to use intrinsic rewards"""
+    max_return_buff_size: int = 20
+    """The size of the buffer to store the maximum episodic returns for computing the optimality gap"""
 
 
 def make_env(env_id, seed, idx, capture_video, run_name):
@@ -155,6 +165,10 @@ poetry run pip install "stable_baselines3==2.0.0a1"
     )
     assert isinstance(envs.single_action_space, gym.spaces.Discrete), "only discrete action space is supported"
 
+    # ===================== build the reward ===================== #
+    if args.intrinsic_rewards:
+        irs = RND(envs=envs, device=device, encoder_model="flat", obs_norm_type="none")
+    # ===================== build the reward ===================== #
     q_network = QNetwork(envs).to(device)
     optimizer = optim.Adam(q_network.parameters(), lr=args.learning_rate)
     target_network = QNetwork(envs).to(device)
@@ -183,6 +197,13 @@ poetry run pip install "stable_baselines3==2.0.0a1"
         # TRY NOT TO MODIFY: execute the game and log data.
         next_obs, rewards, terminations, truncations, infos = envs.step(actions)
 
+        # ===================== watch the interaction ===================== #
+        if args.intrinsic_rewards:
+            irs.watch(observations=obs, actions=actions, 
+                    rewards=rewards, terminateds=terminations, 
+                    truncateds=truncations, next_observations=next_obs)
+        # ===================== watch the interaction ===================== #
+
         # TRY NOT TO MODIFY: record rewards for plotting purposes
         if "final_info" in infos:
             for info in infos["final_info"]:
@@ -207,6 +228,7 @@ poetry run pip install "stable_baselines3==2.0.0a1"
         for idx, trunc in enumerate(truncations):
             if trunc:
                 real_next_obs[idx] = infos["final_observation"][idx]
+
         rb.add(obs, real_next_obs, actions, rewards, terminations, infos)
 
         # TRY NOT TO MODIFY: CRUCIAL step easy to overlook
@@ -216,9 +238,20 @@ poetry run pip install "stable_baselines3==2.0.0a1"
         if global_step > args.learning_starts:
             if global_step % args.train_frequency == 0:
                 data = rb.sample(args.batch_size)
+
+                # ===================== compute the intrinsic rewards ===================== #
+                # get real next observations
+                if args.intrinsic_rewards:
+                    
+                    intrinsic_rewards = irs.compute(samples=dict(observations=data.observations*1.0, actions=data.actions, 
+                                                                rewards=data.rewards, terminateds=data.dones,
+                                                                truncateds=data.dones, next_observations=data.next_observations*1.0
+                                                                ))
+                    rewards_ = data.rewards + intrinsic_rewards
+                # ===================== compute the intrinsic rewards ===================== #
                 with torch.no_grad():
                     target_max, _ = target_network(data.next_observations *1.0).max(dim=1)
-                    td_target = data.rewards.flatten() + args.gamma * target_max * (1 - data.dones.flatten())
+                    td_target = rewards_.flatten() + args.gamma * target_max * (1 - data.dones.flatten())
                 old_val = q_network(data.observations * 1.0).gather(1, data.actions).squeeze()
                 loss = F.mse_loss(td_target, old_val)
 
@@ -232,6 +265,8 @@ poetry run pip install "stable_baselines3==2.0.0a1"
                         writer.add_scalar("charts/rewards mean", data_.rewards.mean(), global_step)
                         writer.add_scalar("charts/rewards top 95%", torch.mean(torch.topk(data_.rewards.flatten(), 500)[0]), global_step)
                         # writer.add_scalar("charts/returns top 95%", torch.mean(torch.topk(data_.returns.flatten(), 500)[0]), global_step)
+                    if args.intrinsic_rewards:
+                        writer.add_scalar("charts/intrinsic_rewards", intrinsic_rewards.mean(), global_step)
 
                 # optimize the model
                 optimizer.zero_grad()

@@ -83,7 +83,9 @@ class Args:
     num_iterations: int = 0
     """the number of iterations (computed in runtime)"""
     intrinsic_rewards: bool = True
-    """whether to use intrinsic rewards"""
+    """Whether to use intrinsic rewards"""
+    max_return_buff_size: int = 20
+    """The size of the buffer to store the maximum episodic returns for computing the optimality gap"""
 
 
 def make_env(env_id, idx, capture_video, run_name):
@@ -179,7 +181,7 @@ if __name__ == "__main__":
 
     # ===================== build the reward ===================== #
     if args.intrinsic_rewards:
-        irs = RND(envs=envs, device=device, encoder_model="flat")
+        irs = RND(envs=envs, device=device, encoder_model="flat", obs_norm_type="none")
     # ===================== build the reward ===================== #
 
     agent = Agent(envs).to(device)
@@ -239,7 +241,7 @@ if __name__ == "__main__":
                         if info["episode"]["r"] > max_return:
                             max_return = info["episode"]["r"]
                         if len(max_returns) == 0:
-                            max_returns = [info["episode"]["r"] for _ in range(10)]
+                            max_returns = [info["episode"]["r"] for _ in range(args.max_return_buff_size)]
                             heapq.heapify(max_returns)
                         if len(max_returns) > 0 and info["episode"]["r"] > min(max_returns):
                             ## Repalce the minimum value in max_returns with the new episodic return
@@ -250,6 +252,7 @@ if __name__ == "__main__":
                         print(f"global_step={global_step}, episodic_return={info['episode']['r']}, best_return={max_return}")
                         writer.add_scalar("charts/episodic_return", info["episode"]["r"], global_step)
                         writer.add_scalar("charts/episodic_length", info["episode"]["l"], global_step)
+
         # ===================== compute the intrinsic rewards ===================== #
         # get real next observations
         if args.intrinsic_rewards:
@@ -263,7 +266,6 @@ if __name__ == "__main__":
                                                         ))
             rewards += intrinsic_rewards
         # ===================== compute the intrinsic rewards ===================== #
-
         # bootstrap value if not done
         with torch.no_grad():
             next_value = agent.get_value(next_obs).reshape(1, -1)
@@ -362,6 +364,8 @@ if __name__ == "__main__":
         writer.add_scalar("charts/reward top 95%", torch.mean(torch.topk(rewards.flatten(), 500)[0]), global_step)
         writer.add_scalar("charts/return mean", rewards.mean(dim=0).mean(), global_step)
         writer.add_scalar("charts/avg_reward_traj top 95%", torch.mean(torch.topk(rewards.mean(dim=0).flatten(), 2)[0]), global_step)
+        if args.intrinsic_rewards:
+            writer.add_scalar("charts/intrinsic_rewards", intrinsic_rewards.mean(), global_step)
 
 
     envs.close()
