@@ -1,2 +1,3 @@
 swig
 gymnasium[box2d]
+-e git+https://github.com/Neo-X/rllte.git
