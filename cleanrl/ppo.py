@@ -14,6 +14,12 @@ from torch.distributions.categorical import Categorical
 from torch.utils.tensorboard import SummaryWriter
 import heapq
 
+# ===================== load the reward module ===================== #
+import sys
+sys.path.append("../")
+from rllte.xplore.reward import RND
+# ===================== load the reward module ===================== #
+
 @dataclass
 class Args:
     exp_name: str = os.path.basename(__file__)[: -len(".py")]
@@ -22,7 +28,7 @@ class Args:
     """seed of the experiment"""
     torch_deterministic: bool = True
     """if toggled, `torch.backends.cudnn.deterministic=False`"""
-    cuda: bool = False
+    cuda: bool = True
     """if toggled, cuda will be enabled by default"""
     track: bool = False
     """if toggled, this experiment will be tracked with Weights and Biases"""
@@ -76,6 +82,8 @@ class Args:
     """the mini-batch size (computed in runtime)"""
     num_iterations: int = 0
     """the number of iterations (computed in runtime)"""
+    intrinsic_rewards: bool = True
+    """whether to use intrinsic rewards"""
 
 
 def make_env(env_id, idx, capture_video, run_name):
@@ -169,6 +177,11 @@ if __name__ == "__main__":
     )
     assert isinstance(envs.single_action_space, gym.spaces.Discrete), "only discrete action space is supported"
 
+    # ===================== build the reward ===================== #
+    if args.intrinsic_rewards:
+        irs = RND(envs=envs, device=device, encoder_model="flat")
+    # ===================== build the reward ===================== #
+
     agent = Agent(envs).to(device)
     optimizer = optim.Adam(agent.parameters(), lr=args.learning_rate, eps=1e-5)
 
@@ -208,6 +221,14 @@ if __name__ == "__main__":
 
             # TRY NOT TO MODIFY: execute the game and log data.
             next_obs, reward, terminations, truncations, infos = envs.step(action.cpu().numpy())
+
+            # ===================== watch the interaction ===================== #
+            if args.intrinsic_rewards:
+                irs.watch(observations=obs[step], actions=actions[step], 
+                      rewards=rewards[step], terminateds=dones[step], 
+                      truncateds=dones[step], next_observations=next_obs)
+            # ===================== watch the interaction ===================== #
+
             next_done = np.logical_or(terminations, truncations)
             rewards[step] = torch.tensor(reward).to(device).view(-1)
             next_obs, next_done = torch.Tensor(next_obs).to(device), torch.Tensor(next_done).to(device)
@@ -229,6 +250,19 @@ if __name__ == "__main__":
                         print(f"global_step={global_step}, episodic_return={info['episode']['r']}, best_return={max_return}")
                         writer.add_scalar("charts/episodic_return", info["episode"]["r"], global_step)
                         writer.add_scalar("charts/episodic_length", info["episode"]["l"], global_step)
+        # ===================== compute the intrinsic rewards ===================== #
+        # get real next observations
+        if args.intrinsic_rewards:
+            real_next_obs = obs.clone()
+            real_next_obs[:-1] = obs[1:]
+            real_next_obs[-1] = next_obs
+
+            intrinsic_rewards = irs.compute(samples=dict(observations=obs, actions=actions, 
+                                                        rewards=rewards, terminateds=dones,
+                                                        truncateds=dones, next_observations=real_next_obs
+                                                        ))
+            rewards += intrinsic_rewards
+        # ===================== compute the intrinsic rewards ===================== #
 
         # bootstrap value if not done
         with torch.no_grad():
