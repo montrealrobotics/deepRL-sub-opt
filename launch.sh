@@ -1,5 +1,5 @@
 #!/bin/bash
-## Run with sbatch --array=1-3 launch.sh
+## Run with sbatch --array=1-3 launch.sh --export=algorithm='dqn',envID='MinAtar/SpaceInvaders-v0'
 
 #SBATCH --partition=long-cpu                             # Ask for unkillable job
 #SBATCH --cpus-per-task=4                               # Ask for 2 CPUs
@@ -10,4 +10,4 @@
 module load cudatoolkit/12.1 miniconda/3
 conda activate cleanrl
 
-python cleanrl/"$algoritm".py --seed $SLURM_ARRAY_TASK_ID --env-id $envID --track --wandb-project-name sub-optimality
+python cleanrl/"$algorithm".py --seed $SLURM_ARRAY_TASK_ID --env-id $envID --track --wandb-project-name sub-optimality
