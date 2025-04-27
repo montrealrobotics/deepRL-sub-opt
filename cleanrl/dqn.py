@@ -13,7 +13,7 @@ import torch.optim as optim
 import tyro
 from stable_baselines3.common.buffers import ReplayBuffer
 from torch.utils.tensorboard import SummaryWriter
-import heapq
+import heapq, collections
 
 # ===================== load the reward module ===================== #
 import sys
@@ -75,10 +75,12 @@ class Args:
     """timestep to start learning"""
     train_frequency: int = 10
     """the frequency of training"""
-    intrinsic_rewards: bool = True
+    intrinsic_rewards: bool = False
     """Whether to use intrinsic rewards"""
-    max_return_buff_size: int = 20
-    """The size of the buffer to store the maximum episodic returns for computing the optimality gap"""
+    top_return_buff_percentage: int = 0.05
+    """The top percent of the buffer for computing the optimality gap"""
+    return_bufer_size: int = 1000
+    """The size of the return buffer for computing the optimality gap"""
 
 
 def make_env(env_id, seed, idx, capture_video, run_name):
@@ -157,6 +159,7 @@ poetry run pip install "stable_baselines3==2.0.0a1"
     max_return = -100000
     ## max_returns is a list of the top 10 episodic returns
     max_returns = []
+    returns = collections.deque(maxlen=args.return_bufer_size)
     device = torch.device("cuda" if torch.cuda.is_available() and args.cuda else "cpu")
 
     # env setup
@@ -185,6 +188,7 @@ poetry run pip install "stable_baselines3==2.0.0a1"
 
     # TRY NOT TO MODIFY: start the game
     obs, _ = envs.reset(seed=args.seed)
+    return_ = 0
     for global_step in range(args.total_timesteps):
         # ALGO LOGIC: put action logic here
         epsilon = linear_schedule(args.start_e, args.end_e, args.exploration_fraction * args.total_timesteps, global_step)
@@ -196,6 +200,8 @@ poetry run pip install "stable_baselines3==2.0.0a1"
 
         # TRY NOT TO MODIFY: execute the game and log data.
         next_obs, rewards, terminations, truncations, infos = envs.step(actions)
+        return_ += rewards
+        infos["return"] = return_
 
         # ===================== watch the interaction ===================== #
         if args.intrinsic_rewards:
@@ -208,20 +214,32 @@ poetry run pip install "stable_baselines3==2.0.0a1"
         if "final_info" in infos:
             for info in infos["final_info"]:
                 if info and "episode" in info:
+                    returns.append(info["episode"]["r"])
                     if info["episode"]["r"] > max_return:
                         max_return = info["episode"]["r"]
                     if len(max_returns) == 0:
-                        max_returns = [info["episode"]["r"] for _ in range(10)]
-                        heapq.heapify(max_returns)
+                        ## If this is the first return jsut story that return
+                        max_returns = [info["episode"]["r"]]
+                        # heapq.heapify(max_returns)
                     if len(max_returns) > 0 and info["episode"]["r"] > min(max_returns):
-                        ## Repalce the minimum value in max_returns with the new episodic return
-                        heapq.heapreplace(max_returns, info["episode"]["r"])
+                        ## Repalce the minimum value in max_returns with the new episodic return if the buffer is full
+                        if (len(max_returns) < int(args.return_bufer_size * (args.top_return_buff_percentage)) ):
+                            ## If the buffer is not full, just append the new episodic return
+                            max_returns.append(info["episode"]["r"])
+                            heapq.heapify(max_returns)
+                        else:
+                            heapq.heapreplace(max_returns, info["episode"]["r"])
+                        
+
                     writer.add_scalar("charts/best_trajectory_return", max_return, global_step)
-                    writer.add_scalar("charts/avg_top_10_returns", np.mean(list(max_returns)), global_step)
-                    writer.add_scalar("charts/online_optimality_gap", np.mean(list(max_returns)) - info["episode"]["r"], global_step)
+                    writer.add_scalar("charts/avg_top_returns", np.mean(list(max_returns)), global_step)
+                    writer.add_scalar("charts/global_optimality_gap", np.mean(list(max_returns)) - info["episode"]["r"], global_step)
+                    returns_ = list(returns)
+                    heapq.heapify(returns_)
+                    writer.add_scalar("charts/local_optimality_gap", np.mean(heapq.nlargest(max(int(args.top_return_buff_percentage * len(returns_)), 1), returns_)) - np.mean(returns_), global_step)
                     print(f"global_step={global_step}, episodic_return={info['episode']['r']}, best_return={max_return}")
                     writer.add_scalar("charts/episodic_return", info["episode"]["r"], global_step)
-                    writer.add_scalar("charts/episodic_length", info["episode"]["l"], global_step)
+            return_ = 0
 
         # TRY NOT TO MODIFY: save data to reply buffer; handle `final_observation`
         real_next_obs = next_obs.copy()
@@ -238,7 +256,7 @@ poetry run pip install "stable_baselines3==2.0.0a1"
         if global_step > args.learning_starts:
             if global_step % args.train_frequency == 0:
                 data = rb.sample(args.batch_size)
-
+                rewards_ = data.rewards
                 # ===================== compute the intrinsic rewards ===================== #
                 # get real next observations
                 if args.intrinsic_rewards:
@@ -247,7 +265,7 @@ poetry run pip install "stable_baselines3==2.0.0a1"
                                                                 rewards=data.rewards, terminateds=data.dones,
                                                                 truncateds=data.dones, next_observations=data.next_observations*1.0
                                                                 ))
-                    rewards_ = data.rewards + intrinsic_rewards
+                    rewards_ += intrinsic_rewards
                 # ===================== compute the intrinsic rewards ===================== #
                 with torch.no_grad():
                     target_max, _ = target_network(data.next_observations *1.0).max(dim=1)

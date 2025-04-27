@@ -82,10 +82,12 @@ class Args:
     """the mini-batch size (computed in runtime)"""
     num_iterations: int = 0
     """the number of iterations (computed in runtime)"""
-    intrinsic_rewards: bool = True
+    intrinsic_rewards: bool = False
     """Whether to use intrinsic rewards"""
-    max_return_buff_size: int = 20
-    """The size of the buffer to store the maximum episodic returns for computing the optimality gap"""
+    max_return_buff_percentage: int = 0.95
+    """The top percent of the buffer for computing the optimality gap"""
+    buffer_size: int = 100000
+    """the replay memory buffer size"""
 
 
 def make_env(env_id, idx, capture_video, run_name):
