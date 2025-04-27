@@ -1,7 +1,7 @@
 #/bin/bash
 ## Code to run all the jobs for this codebase 
 
-sbatch --array=1-3 launch.sh --export=algorithm='dqn',envID='MinAtar/SpaceInvaders-v0'
+sbatch --array=1-3 --export=ALL,ALG='cleanrl/dqn.py',ENV_ID='MinAtar/SpaceInvaders-v0' launch.sh
 # sbatch --array=1-3 launch.sh --export=algorithm='dqn',envID='MinAtar/Asterix-v0'
 # sbatch --array=1-3 launch.sh --export=algorithm='dqn',envID='LunarLander-v2'
 # sbatch --array=1-3 launch.sh --export=algorithm='ppo',envID='MinAtar/SpaceInvaders-v0'
