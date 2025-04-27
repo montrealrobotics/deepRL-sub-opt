@@ -9,7 +9,6 @@
 
 module load cudatoolkit/12.1 miniconda/3
 conda activate cleanrl
-
 echo $ALG
 echo $ENV_ID
 python $ALG --seed $SLURM_ARRAY_TASK_ID --env-id $ENV_ID --track --wandb-project-name sub-optimality
