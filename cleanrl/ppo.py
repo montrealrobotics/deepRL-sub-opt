@@ -146,7 +146,10 @@ if __name__ == "__main__":
     args.minibatch_size = int(args.batch_size // args.num_minibatches)
     args.num_iterations = args.total_timesteps // args.batch_size
     run_name = f"{args.env_id}__{args.exp_name}__{args.seed}__{int(time.time())}"
+    #====================== optimality gap computation library ======================#
+    import buffer_gap
     gap_stats = buffer_gap.BufferGapV2(args.return_buffer_size, args.top_return_buff_percentage)
+    #====================== optimality gap computation library ======================#
     if args.track:
         import wandb
 

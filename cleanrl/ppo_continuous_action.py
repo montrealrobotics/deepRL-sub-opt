@@ -85,8 +85,11 @@ class Args:
     """the number of iterations (computed in runtime)"""
     intrinsic_rewards: bool = True
     """Whether to use intrinsic rewards"""
-    max_return_buff_size: int = 20
-    """The size of the buffer to store the maximum episodic returns for computing the optimality gap"""
+    top_return_buff_percentage: int = 0.95
+    """The top percent of the buffer for computing the optimality gap"""
+    return_buffer_size: int = 1000
+    """the replay memory buffer size"""
+
 
 
 def make_env(env_id, idx, capture_video, run_name, gamma):
@@ -152,6 +155,10 @@ if __name__ == "__main__":
     args.minibatch_size = int(args.batch_size // args.num_minibatches)
     args.num_iterations = args.total_timesteps // args.batch_size
     run_name = f"{args.env_id}__{args.exp_name}__{args.seed}__{int(time.time())}"
+    #====================== optimality gap computation library ======================#
+    import buffer_gap
+    gap_stats = buffer_gap.BufferGapV2(args.return_buffer_size, args.top_return_buff_percentage)
+    #====================== optimality gap computation library ======================#
     if args.track:
         import wandb
 
@@ -236,17 +243,10 @@ if __name__ == "__main__":
                         print(f"global_step={global_step}, episodic_return={info['episode']['r']}")
                         writer.add_scalar("charts/episodic_return", info["episode"]["r"], global_step)
                         writer.add_scalar("charts/episodic_length", info["episode"]["l"], global_step)
-                        if info["episode"]["r"] > max_return:
-                            max_return = info["episode"]["r"]
-                        if len(max_returns) == 0:
-                            max_returns = [info["episode"]["r"] for _ in range(10)]
-                            heapq.heapify(max_returns)
-                        if len(max_returns) > 0 and info["episode"]["r"] > min(max_returns):
-                            ## Repalce the minimum value in max_returns with the new episodic return
-                            heapq.heapreplace(max_returns, info["episode"]["r"])
-                        writer.add_scalar("charts/best_trajectory_return", max_return, global_step)
-                        writer.add_scalar("charts/avg_top_10_returns", np.mean(list(max_returns)), global_step)
-                        writer.add_scalar("charts/online_optimality_gap", np.mean(list(max_returns)) - info["episode"]["r"], global_step)
+                        #====================== optimality gap computation logging ======================#
+                        gap_stats.add(info["episode"]["r"])
+                        gap_stats.plot_gap(writer, global_step)
+                        #====================== optimality gap computation logging ======================#
 
         # bootstrap value if not done
         with torch.no_grad():
