@@ -12,13 +12,13 @@ import torch.optim as optim
 import tyro
 from torch.distributions.categorical import Categorical
 from torch.utils.tensorboard import SummaryWriter
-import heapq
 
 # ===================== load the reward module ===================== #
 import sys
 sys.path.append("../")
 from rllte.xplore.reward import RND
 # ===================== load the reward module ===================== #
+import buffer_gap
 
 @dataclass
 class Args:
@@ -84,9 +84,9 @@ class Args:
     """the number of iterations (computed in runtime)"""
     intrinsic_rewards: bool = False
     """Whether to use intrinsic rewards"""
-    max_return_buff_percentage: int = 0.95
+    top_return_buff_percentage: int = 0.95
     """The top percent of the buffer for computing the optimality gap"""
-    buffer_size: int = 100000
+    return_buffer_size: int = 1000
     """the replay memory buffer size"""
 
 
@@ -146,9 +146,7 @@ if __name__ == "__main__":
     args.minibatch_size = int(args.batch_size // args.num_minibatches)
     args.num_iterations = args.total_timesteps // args.batch_size
     run_name = f"{args.env_id}__{args.exp_name}__{args.seed}__{int(time.time())}"
-    max_return = -100000
-    ## max_returns is a list of the top 10 episodic returns
-    max_returns = []
+    gap_stats = buffer_gap.BufferGapV2(args.return_buffer_size, args.top_return_buff_percentage)
     if args.track:
         import wandb
 
@@ -240,20 +238,14 @@ if __name__ == "__main__":
             if "final_info" in infos:
                 for info in infos["final_info"]:
                     if info and "episode" in info:
-                        if info["episode"]["r"] > max_return:
-                            max_return = info["episode"]["r"]
-                        if len(max_returns) == 0:
-                            max_returns = [info["episode"]["r"] for _ in range(args.max_return_buff_size)]
-                            heapq.heapify(max_returns)
-                        if len(max_returns) > 0 and info["episode"]["r"] > min(max_returns):
-                            ## Repalce the minimum value in max_returns with the new episodic return
-                            heapq.heapreplace(max_returns, info["episode"]["r"])
-                        writer.add_scalar("charts/best_trajectory_return", max_return, global_step)
-                        writer.add_scalar("charts/avg_top_10_returns", np.mean(list(max_returns)), global_step)
-                        writer.add_scalar("charts/online_optimality_gap", np.mean(list(max_returns)) - info["episode"]["r"], global_step)
-                        print(f"global_step={global_step}, episodic_return={info['episode']['r']}, best_return={max_return}")
+                        print(f"global_step={global_step}, episodic_return={info['episode']['r']}")
                         writer.add_scalar("charts/episodic_return", info["episode"]["r"], global_step)
                         writer.add_scalar("charts/episodic_length", info["episode"]["l"], global_step)
+                        #====================== optimality gap computation logging ======================#
+                        gap_stats.add(info["episode"]["r"])
+                        gap_stats.plot_gap(writer, global_step)
+                        #====================== optimality gap computation logging ======================#
+
 
         # ===================== compute the intrinsic rewards ===================== #
         # get real next observations
