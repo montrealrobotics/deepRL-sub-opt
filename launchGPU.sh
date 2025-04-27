@@ -11,4 +11,4 @@
 module load cudatoolkit/12.1 miniconda/3
 conda activate cleanrl
 
-python cleanrl/dqn_atari.py --seed $SLURM_ARRAY_TASK_ID --env-id $envID --track --wandb-project-name sub-optimality
+python $ALG --seed $SLURM_ARRAY_TASK_ID --env-id $ENV_ID --track --wandb-project-name sub-optimality
