@@ -11,14 +11,4 @@
 module load cudatoolkit/12.1 miniconda/3
 conda activate cleanrl
 
-python cleanrl/dqn.py --seed $SLURM_ARRAY_TASK_ID --env-id MinAtar/SpaceInvaders-v0 --track --wandb-project-name sub-optimality
-python cleanrl/dqn.py --seed $SLURM_ARRAY_TASK_ID --env-id MinAtar/SpaceInvaders-v0 --track --wandb-project-name sub-optimality --intrinsic_rewards
-# python cleanrl/dqn.py --seed $SLURM_ARRAY_TASK_ID --env-id MinAtar/Asterix-v0 --track --wandb-project-name sub-optimality
-# python cleanrl/dqn.py --seed $SLURM_ARRAY_TASK_ID --env-id LunarLander-v2 --track --wandb-project-name sub-optimality
-
-# python cleanrl/ppo.py --seed $SLURM_ARRAY_TASK_ID --env-id MinAtar/SpaceInvaders-v0 --track --wandb-project-name sub-optimality
-# python cleanrl/ppo.py --seed $SLURM_ARRAY_TASK_ID --env-id MinAtar/Asterix-v0 --track --wandb-project-name sub-optimality
-# python cleanrl/ppo.py --seed $SLURM_ARRAY_TASK_ID --env-id LunarLander-v2 --track --wandb-project-name sub-optimality
-
-# python cleanrl/ppo_continuous_action.py --seed $SLURM_ARRAY_TASK_ID --env-id Walker2d-v4 --track --wandb-project-name sub-optimality
-# python cleanrl/ppo_continuous_action.py --seed $SLURM_ARRAY_TASK_ID --env-id HalfCheetah-v4 --track --wandb-project-name sub-optimality
+python cleanrl/dqn_atari.py --seed $SLURM_ARRAY_TASK_ID --env-id $envID --track --wandb-project-name sub-optimality
