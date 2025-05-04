@@ -42,7 +42,7 @@ class Args:
     """whether to capture videos of the agent performances (check out `videos` folder)"""
 
     # Algorithm specific arguments
-    env_id: str = "BreakoutNoFrameskip-v4"
+    env_id: str = "SpaceInvadersNoFrameskip-v4"
     """the id of the environment"""
     total_timesteps: int = 10000000
     """total timesteps of the experiments"""
@@ -84,6 +84,10 @@ class Args:
     """the mini-batch size (computed in runtime)"""
     num_iterations: int = 0
     """the number of iterations (computed in runtime)"""
+    top_return_buff_percentage: int = 0.05
+    """The top percent of the buffer for computing the optimality gap"""
+    return_buffer_size: int = 1000
+    """The size of the return buffer for computing the optimality gap"""
 
 
 def make_env(env_id, idx, capture_video, run_name):
@@ -173,6 +177,11 @@ if __name__ == "__main__":
     torch.manual_seed(args.seed)
     torch.backends.cudnn.deterministic = args.torch_deterministic
 
+    #====================== optimality gap computation library ======================#
+    import buffer_gap
+    gap_stats = buffer_gap.BufferGapV2(args.return_buffer_size, args.top_return_buff_percentage)
+    #====================== optimality gap computation library ======================#
+
     device = torch.device("cuda" if torch.cuda.is_available() and args.cuda else "cpu")
 
     # env setup
@@ -230,6 +239,10 @@ if __name__ == "__main__":
                         print(f"global_step={global_step}, episodic_return={info['episode']['r']}")
                         writer.add_scalar("charts/episodic_return", info["episode"]["r"], global_step)
                         writer.add_scalar("charts/episodic_length", info["episode"]["l"], global_step)
+                        #====================== optimality gap computation logging ======================#
+                        gap_stats.add(info["episode"]["r"])
+                        gap_stats.plot_gap(writer, global_step)
+                        #====================== optimality gap computation logging ======================#
 
         # bootstrap value if not done
         with torch.no_grad():

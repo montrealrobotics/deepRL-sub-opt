@@ -1,15 +1,9 @@
 
 
-"""
-sudo pip3 install pandas
-sudo pip3 install seaborn
-"""
-
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns; sns.set(font_scale=1.2)
-import pdb
 
 colors = {'SMiRL (ours)': 'k',
           'SMiRL VAE (ours)': 'purple',
@@ -114,16 +108,17 @@ if __name__ == '__main__':
     fig, (ax3) = plt.subplots(1, 1, figsize=(8,5))
     #*******************************************************************************
     #####################
-    ##### Stability #####
+    ##### Global Optimality #####
     #####################
     #*******************************************************************************
     
     datadir = './data/SpaceInvaders_MinAtar_global_optimality_gap.csv'
     df = pd.read_csv(datadir)
-    ax3.set_title('Optimality for SpaceInvaders')
+    title = 'Global Optimality for SpaceInvaders'
+    ax3.set_title(title)
     
     #####################
-    ##### w/ SMiRL ######
+    ##### w/ DQN ######
     #####################
     
     res = 50
@@ -141,7 +136,7 @@ if __name__ == '__main__':
     
     
     # #####################
-    # ##### w/ ICM ######
+    # ##### w/ PPO ######
     # #####################
     
     keys_ = ["MinAtar/SpaceInvaders-v0__ppo__3__1745790012 - charts/global_optimality_gap",
@@ -159,11 +154,62 @@ if __name__ == '__main__':
     ax3.set(ylabel='Global Optimality Gap')
     ax3.set(xlabel='Steps')
     ax3.legend()
-    '''
-    handles, labels = ax2.get_legend_handles_labels()
-    plt.figlegend(handles, labels, ncol=5, mode='expand', bbox_to_anchor=(.37,.03,.3,.1))
-    '''
     #plt.subplots_adjust(bottom=.25, wspace=.25)
     plt.show()
-    fig.savefig("file0"+".svg")
-    fig.savefig("file0"+".png")
+    fig.savefig(title+".svg")
+    fig.savefig(title+".png")
+
+
+    fig, (ax3) = plt.subplots(1, 1, figsize=(8,5))
+    #*******************************************************************************
+    #####################
+    ##### Global Optimality #####
+    #####################
+    #*******************************************************************************
+    
+    datadir = './data/MinAtar_Asterix_global_optimality_gap.csv'
+    df = pd.read_csv(datadir)
+    title = 'Global Optimality for Asterix'
+    ax3.set_title(title)
+    
+    #####################
+    ##### w/ DQN ######
+    #####################
+    
+    res = 50
+
+
+    keys_ = ["MinAtar/Asterix-v0__dqn__1 - charts/global_optimality_gap",
+             "MinAtar/Asterix-v0__dqn__2 - charts/global_optimality_gap",
+             "MinAtar/Asterix-v0__dqn__3 - charts/global_optimality_gap"]
+    plot_data = get_data_frame(df, keys=keys_, res=res)
+
+    label='DQN'
+    plot_data = plot_data.rename(columns={0: 'Steps', 1: label})
+    sns.lineplot(data=plot_data, x='Steps', y=label, ax=ax3, label=label)
+    # ax3.lines[-1].set_linestyle(linestyle[label])
+    
+    
+    # #####################
+    # ##### w/ PPO ######
+    # #####################
+    
+    keys_ = ["MinAtar/Asterix-v0__ppo__1 - charts/global_optimality_gap",
+             "MinAtar/Asterix-v0__ppo__2 - charts/global_optimality_gap",
+             "MinAtar/Asterix-v0__ppo__3 - charts/global_optimality_gap"]
+    plot_data = get_data_frame(df, keys=keys_, res=res)
+
+    label='PPO'
+    plot_data = plot_data.rename(columns={0: 'Steps', 1: label} )
+    sns.lineplot(data=plot_data, x='Steps', y=label, ax=ax3, label=label)
+    # ax3.lines[-1].set_linestyle(linestyle[label])
+    
+    
+    ax3.ticklabel_format(axis= 'x', style='sci', scilimits=(0,3))
+    ax3.set(ylabel='Global Optimality Gap')
+    ax3.set(xlabel='Steps')
+    ax3.legend()
+    #plt.subplots_adjust(bottom=.25, wspace=.25)
+    plt.show()
+    fig.savefig(title+".svg")
+    fig.savefig(title+".png")
