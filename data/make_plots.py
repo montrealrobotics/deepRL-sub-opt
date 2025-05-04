@@ -73,6 +73,41 @@ def save(fname):
     plt.savefig('{}.png'.format(fname))
     plt.clf()
     '''
+
+def deNan(data_):
+    if np.isnan(data_[0]):
+        ## Search foreward for a value and replace the first values
+        i = 0
+        while np.isnan(data_[i]):
+            i += 1
+        data_[:i] = data_[i]
+
+    ## Repalce all NaN values with the last value
+    for i in range(len(data_)): 
+        if np.isnan(data_[i]):
+            data_[i] = data_[i-1]
+    return data_
+
+def get_data_frame(df, keys, res=10):
+
+    steps_ = df["Step"].to_numpy()
+    steps_ = np.array([np.mean(steps_[i:i+res]) for i in range(0, len(steps_)-res+1, res)])
+    plot_data = []
+    for key in keys:   
+        data_ = df[key].to_numpy()
+        data_ = deNan(data_)
+        print(key, data_)
+        # data_ = (np.cumsum(data_)[res:] - np.cumsum(data_)[:-res])/res
+        
+        ## Average over the last 5 values with the resulting array being one 5th shorter
+        data_ = np.array([np.mean(data_[i:i+res]) for i in range(0, len(data_)-res+1, res)])
+
+
+        plot_data.extend([(step_, val) for step_, val in zip(steps_, data_)])
+    
+    plot_data = pd.DataFrame(plot_data)
+    
+    return plot_data
         
 if __name__ == '__main__':
 
@@ -83,7 +118,7 @@ if __name__ == '__main__':
     #####################
     #*******************************************************************************
     
-    datadir = './data/SpaceInvaders_CNN.csv'
+    datadir = './data/SpaceInvaders_MinAtar_global_optimality_gap.csv'
     df = pd.read_csv(datadir)
     ax3.set_title('Optimality for SpaceInvaders')
     
@@ -91,22 +126,17 @@ if __name__ == '__main__':
     ##### w/ SMiRL ######
     #####################
     
-    res = 5
-    steps_ = df["Step"].to_numpy()
-    data_ = df["SpaceInvadersNoFrameskip-v4__dqn_atari__1__1745790578 - charts/local_optimality_gap"].to_numpy()
-    
-    data_ = (np.cumsum(data_)[res:] - np.cumsum(data_)[:-res])/res
-    plot_data = [(step_, val) for step_, val in zip(steps_, data_)]
-    
-    
-    data_ = df["SpaceInvadersNoFrameskip-v4__dqn_atari__3__1745790573 - charts/local_optimality_gap"].to_numpy()
-    data_ = (np.cumsum(data_)[res:] - np.cumsum(data_)[:-res])/res
-    plot_data.extend([(step_, val) for step_, val in zip(steps_, data_)])
-    
-    bf = pd.DataFrame(plot_data)
-    label='local_optimality_gap'
-    bf = bf.rename(columns={0: 'Steps', 1: label})
-    sns.lineplot(data=bf, x='Steps', y=label, ax=ax3, label=label)
+    res = 50
+
+
+    keys_ = ["MinAtar/SpaceInvaders-v0__dqn__1__1745789971 - charts/global_optimality_gap",
+             "MinAtar/SpaceInvaders-v0__dqn__2__1745789970 - charts/global_optimality_gap",
+             "MinAtar/SpaceInvaders-v0__dqn__3__1745789971 - charts/global_optimality_gap"]
+    plot_data = get_data_frame(df, keys=keys_, res=res)
+
+    label='DQN'
+    plot_data = plot_data.rename(columns={0: 'Steps', 1: label})
+    sns.lineplot(data=plot_data, x='Steps', y=label, ax=ax3, label=label)
     # ax3.lines[-1].set_linestyle(linestyle[label])
     
     
@@ -114,27 +144,19 @@ if __name__ == '__main__':
     # ##### w/ ICM ######
     # #####################
     
-    steps_ = df["Step"].to_numpy()
-    data_ = df["SpaceInvadersNoFrameskip-v4__dqn_atari__1__1745790578 - charts/local_optimality_gap"].to_numpy()
-    
-    data_ = (np.cumsum(data_)[res:] - np.cumsum(data_)[:-res])/res
-    plot_data = [(step_, val) for step_, val in zip(steps_, data_)]
-    
-    
-    data_ = df["SpaceInvadersNoFrameskip-v4__dqn_atari__2__1745790573 - charts/local_optimality_gap"].to_numpy()
-    data_ = (np.cumsum(data_)[res:] - np.cumsum(data_)[:-res])/res
-    plot_data.extend([(step_, val) for step_, val in zip(steps_, data_)])
+    keys_ = ["MinAtar/SpaceInvaders-v0__ppo__3__1745790012 - charts/global_optimality_gap",
+             "MinAtar/SpaceInvaders-v0__ppo__2__1745790012 - charts/global_optimality_gap",
+             "MinAtar/SpaceInvaders-v0__ppo__1__1745790012 - charts/global_optimality_gap"]
+    plot_data = get_data_frame(df, keys=keys_, res=res)
 
-    
-    bf = pd.DataFrame(plot_data)
-    label='optimality_gap_Max'
-    bf = bf.rename(columns={0: 'Steps', 1: label} )
-    sns.lineplot(data=bf, x='Steps', y=label, ax=ax3, label=label)
+    label='PPO'
+    plot_data = plot_data.rename(columns={0: 'Steps', 1: label} )
+    sns.lineplot(data=plot_data, x='Steps', y=label, ax=ax3, label=label)
     # ax3.lines[-1].set_linestyle(linestyle[label])
     
     
     ax3.ticklabel_format(axis= 'x', style='sci', scilimits=(0,3))
-    ax3.set(ylabel='% Optimality Gap')
+    ax3.set(ylabel='Global Optimality Gap')
     ax3.set(xlabel='Steps')
     ax3.legend()
     '''
