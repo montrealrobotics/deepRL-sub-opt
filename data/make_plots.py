@@ -158,6 +158,7 @@ if __name__ == '__main__':
     plt.show()
     fig.savefig(title+".svg")
     fig.savefig(title+".png")
+    fig.savefig(title+".pdf")
 
 
     fig, (ax3) = plt.subplots(1, 1, figsize=(8,5))
@@ -213,3 +214,4 @@ if __name__ == '__main__':
     plt.show()
     fig.savefig(title+".svg")
     fig.savefig(title+".png")
+    fig.savefig(title+".pdf")
