@@ -21,6 +21,12 @@ from stable_baselines3.common.atari_wrappers import (  # isort:skip
     NoopResetEnv,
 )
 
+# ===================== load the reward module ===================== #
+import sys
+sys.path.append("../")
+from rllte.xplore.reward import RND
+# ===================== load the reward module ===================== #
+
 
 @dataclass
 class Args:
@@ -84,6 +90,8 @@ class Args:
     """the mini-batch size (computed in runtime)"""
     num_iterations: int = 0
     """the number of iterations (computed in runtime)"""
+    intrinsic_rewards: bool = False
+    """Whether to use intrinsic rewards"""
     top_return_buff_percentage: int = 0.05
     """The top percent of the buffer for computing the optimality gap"""
     return_buffer_size: int = 1000
@@ -190,6 +198,11 @@ if __name__ == "__main__":
     )
     assert isinstance(envs.single_action_space, gym.spaces.Discrete), "only discrete action space is supported"
 
+    # ===================== build the reward ===================== #
+    if args.intrinsic_rewards:
+        irs = RND(envs=envs, device=device, encoder_model="flat", obs_norm_type="none")
+    # ===================== build the reward ===================== #
+
     agent = Agent(envs).to(device)
     optimizer = optim.Adam(agent.parameters(), lr=args.learning_rate, eps=1e-5)
 
@@ -229,6 +242,14 @@ if __name__ == "__main__":
 
             # TRY NOT TO MODIFY: execute the game and log data.
             next_obs, reward, terminations, truncations, infos = envs.step(action.cpu().numpy())
+
+            # ===================== watch the interaction ===================== #
+            if args.intrinsic_rewards:
+                irs.watch(observations=obs[step], actions=actions[step], 
+                      rewards=rewards[step], terminateds=dones[step], 
+                      truncateds=dones[step], next_observations=next_obs)
+            # ===================== watch the interaction ===================== #
+
             next_done = np.logical_or(terminations, truncations)
             rewards[step] = torch.tensor(reward).to(device).view(-1)
             next_obs, next_done = torch.Tensor(next_obs).to(device), torch.Tensor(next_done).to(device)
@@ -243,6 +264,20 @@ if __name__ == "__main__":
                         gap_stats.add(info["episode"]["r"])
                         gap_stats.plot_gap(writer, global_step)
                         #====================== optimality gap computation logging ======================#
+
+        # ===================== compute the intrinsic rewards ===================== #
+        # get real next observations
+        if args.intrinsic_rewards:
+            real_next_obs = obs.clone()
+            real_next_obs[:-1] = obs[1:]
+            real_next_obs[-1] = next_obs
+
+            intrinsic_rewards = irs.compute(samples=dict(observations=obs, actions=actions, 
+                                                        rewards=rewards, terminateds=dones,
+                                                        truncateds=dones, next_observations=real_next_obs
+                                                        ))
+            rewards += intrinsic_rewards
+        # ===================== compute the intrinsic rewards ===================== #
 
         # bootstrap value if not done
         with torch.no_grad():
@@ -337,6 +372,8 @@ if __name__ == "__main__":
         writer.add_scalar("losses/explained_variance", explained_var, global_step)
         print("SPS:", int(global_step / (time.time() - start_time)))
         writer.add_scalar("charts/SPS", int(global_step / (time.time() - start_time)), global_step)
+        if args.intrinsic_rewards:
+            writer.add_scalar("charts/intrinsic_rewards", intrinsic_rewards.mean(), global_step)
 
     envs.close()
     writer.close()

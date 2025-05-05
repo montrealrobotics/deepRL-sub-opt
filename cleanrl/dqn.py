@@ -127,8 +127,8 @@ if __name__ == "__main__":
         raise ValueError(
             """Ongoing migration: run the following command to install the new dependencies:
 
-poetry run pip install "stable_baselines3==2.0.0a1"
-"""
+            poetry run pip install "stable_baselines3==2.0.0a1"
+            """
         )
     args = tyro.cli(Args)
     assert args.num_envs == 1, "vectorized envs are not supported at the moment"

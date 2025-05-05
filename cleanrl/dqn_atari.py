@@ -21,6 +21,11 @@ from stable_baselines3.common.atari_wrappers import (
 from stable_baselines3.common.buffers import ReplayBuffer
 from torch.utils.tensorboard import SummaryWriter
 
+# ===================== load the reward module ===================== #
+import sys
+sys.path.append("../")
+from rllte.xplore.reward import RND
+# ===================== load the reward module ===================== #
 
 @dataclass
 class Args:
@@ -48,7 +53,7 @@ class Args:
     """the user or org name of the model repository from the Hugging Face Hub"""
 
     # Algorithm specific arguments
-    env_id: str = "MontezumaRevengeNoFrameskip-v4"
+    env_id: str = "SpaceInvadersNoFrameskip-v4"
     """the id of the environment"""
     total_timesteps: int = 10000000
     """total timesteps of the experiments"""
@@ -76,6 +81,8 @@ class Args:
     """timestep to start learning"""
     train_frequency: int = 4
     """the frequency of training"""
+    intrinsic_rewards: bool = False
+    """Whether to use intrinsic rewards"""
     top_return_buff_percentage: int = 0.05
     """The top percent of the buffer for computing the optimality gap"""
     return_buffer_size: int = 1000
@@ -180,7 +187,10 @@ poetry run pip install "stable_baselines3==2.0.0a1" "gymnasium[atari,accept-rom-
         [make_env(args.env_id, args.seed + i, i, args.capture_video, run_name) for i in range(args.num_envs)]
     )
     assert isinstance(envs.single_action_space, gym.spaces.Discrete), "only discrete action space is supported"
-
+    # ===================== build the reward ===================== #
+    if args.intrinsic_rewards:
+        irs = RND(envs=envs, device=device, encoder_model="flat", obs_norm_type="none")
+    # ===================== build the reward ===================== #
     
     q_network = QNetwork(envs).to(device)
     optimizer = optim.Adam(q_network.parameters(), lr=args.learning_rate)
@@ -211,6 +221,13 @@ poetry run pip install "stable_baselines3==2.0.0a1" "gymnasium[atari,accept-rom-
         # TRY NOT TO MODIFY: execute the game and log data.
         next_obs, rewards, terminations, truncations, infos = envs.step(actions)
 
+        # ===================== watch the interaction ===================== #
+        if args.intrinsic_rewards:
+            irs.watch(observations=obs, actions=actions, 
+                    rewards=rewards, terminateds=terminations, 
+                    truncateds=truncations, next_observations=next_obs)
+        # ===================== watch the interaction ===================== #
+
         # TRY NOT TO MODIFY: record rewards for plotting purposes
         if "final_info" in infos:
             for info in infos["final_info"]:
@@ -237,9 +254,20 @@ poetry run pip install "stable_baselines3==2.0.0a1" "gymnasium[atari,accept-rom-
         if global_step > args.learning_starts:
             if global_step % args.train_frequency == 0:
                 data = rb.sample(args.batch_size)
+                rewards_ = data.rewards
+                # ===================== compute the intrinsic rewards ===================== #
+                # get real next observations
+                if args.intrinsic_rewards:
+                    
+                    intrinsic_rewards = irs.compute(samples=dict(observations=data.observations*1.0, actions=data.actions, 
+                                                                rewards=data.rewards, terminateds=data.dones,
+                                                                truncateds=data.dones, next_observations=data.next_observations*1.0
+                                                                ))
+                    rewards_ += intrinsic_rewards
+                # ===================== compute the intrinsic rewards ===================== #
                 with torch.no_grad():
                     target_max, _ = target_network(data.next_observations).max(dim=1)
-                    td_target = data.rewards.flatten() + args.gamma * target_max * (1 - data.dones.flatten())
+                    td_target = rewards_.flatten() + args.gamma * target_max * (1 - data.dones.flatten())
                 old_val = q_network(data.observations).gather(1, data.actions).squeeze()
                 loss = F.mse_loss(td_target, old_val)
 
@@ -248,6 +276,8 @@ poetry run pip install "stable_baselines3==2.0.0a1" "gymnasium[atari,accept-rom-
                     writer.add_scalar("losses/q_values", old_val.mean().item(), global_step)
                     print("SPS:", int(global_step / (time.time() - start_time)))
                     writer.add_scalar("charts/SPS", int(global_step / (time.time() - start_time)), global_step)
+                    if args.intrinsic_rewards:
+                        writer.add_scalar("charts/intrinsic_rewards", intrinsic_rewards.mean(), global_step)
 
                 # optimize the model
                 optimizer.zero_grad()
