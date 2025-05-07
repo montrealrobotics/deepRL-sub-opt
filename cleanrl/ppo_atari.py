@@ -200,7 +200,7 @@ if __name__ == "__main__":
 
     # ===================== build the reward ===================== #
     if args.intrinsic_rewards:
-        irs = RND(envs=envs, device=device, obs_norm_type="none")
+        irs = RND(envs=envs, device=device)
     # ===================== build the reward ===================== #
 
     agent = Agent(envs).to(device)

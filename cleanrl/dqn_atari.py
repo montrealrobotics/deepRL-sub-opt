@@ -189,7 +189,7 @@ poetry run pip install "stable_baselines3==2.0.0a1" "gymnasium[atari,accept-rom-
     assert isinstance(envs.single_action_space, gym.spaces.Discrete), "only discrete action space is supported"
     # ===================== build the reward ===================== #
     if args.intrinsic_rewards:
-        irs = RND(envs=envs, device=device, obs_norm_type="none")
+        irs = RND(envs=envs, device=device)
     # ===================== build the reward ===================== #
     
     q_network = QNetwork(envs).to(device)
