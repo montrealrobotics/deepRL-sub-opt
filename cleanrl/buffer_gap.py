@@ -90,7 +90,8 @@ class BufferGapV2():
         returns_ = list(self._returns)
         heapq.heapify(returns_)
         writer.add_scalar("charts/best_trajectory_return", self._max_return, step)
-        writer.add_scalar("charts/avg_top_returns", np.mean(list(self._max_returns)), step)
+        writer.add_scalar("charts/avg_top_returns_global", np.mean(list(self._max_returns)), step)
+        writer.add_scalar("charts/avg_top_returns_local", np.mean(heapq.nlargest(max(int(self._top_buffer_percet * len(returns_)), 1), returns_)), step)
         writer.add_scalar("charts/global_optimality_gap", np.mean(list(self._max_returns)) - np.mean(returns_), step)
         writer.add_scalar("charts/local_optimality_gap", np.mean(heapq.nlargest(max(int(self._top_buffer_percet * len(returns_)), 1), returns_)) - np.mean(returns_), step)
         

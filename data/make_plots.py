@@ -105,6 +105,7 @@ def get_data_frame(df, keys, res=10):
         
 if __name__ == '__main__':
 
+    res = 50
     fig, (ax3) = plt.subplots(1, 1, figsize=(8,5))
     #*******************************************************************************
     #####################
@@ -116,14 +117,24 @@ if __name__ == '__main__':
     df = pd.read_csv(datadir)
     title = 'Global Optimality for SpaceInvaders'
     ax3.set_title(title)
+
+    #####################
+    ##### w/ Optimal ######
+
+    steps_ = df["Step"].to_numpy()
+    steps_ = np.array([np.mean(steps_[i:i+res]) for i in range(0, len(steps_)-res+1, res)])
+    plot_data = pd.DataFrame([(step_, 500) for step_ in steps_])
+
+    label='Oracle'
+    plot_data = plot_data.rename(columns={0: 'Steps', 1: label})
+    sns.lineplot(data=plot_data, x='Steps', y=label, ax=ax3, label=label)
+    ax3.lines[-1].set_linestyle(linestyle[label])
+
     
     #####################
     ##### w/ DQN ######
     #####################
     
-    res = 50
-
-
     keys_ = ["MinAtar/SpaceInvaders-v0__dqn__1__1745789971 - charts/global_optimality_gap",
              "MinAtar/SpaceInvaders-v0__dqn__2__1745789970 - charts/global_optimality_gap",
              "MinAtar/SpaceInvaders-v0__dqn__3__1745789971 - charts/global_optimality_gap"]
@@ -172,14 +183,23 @@ if __name__ == '__main__':
     df = pd.read_csv(datadir)
     title = 'Global Optimality for Asterix'
     ax3.set_title(title)
+
+    #######################
+    ##### w/ Optimal ######
+
+    steps_ = df["Step"].to_numpy()
+    steps_ = np.array([np.mean(steps_[i:i+res]) for i in range(0, len(steps_)-res+1, res)])
+    plot_data = pd.DataFrame([(step_, 500) for step_ in steps_])
+
+    label='Oracle'
+    plot_data = plot_data.rename(columns={0: 'Steps', 1: label})
+    sns.lineplot(data=plot_data, x='Steps', y=label, ax=ax3, label=label)
+    ax3.lines[-1].set_linestyle(linestyle[label])
     
     #####################
     ##### w/ DQN ######
     #####################
     
-    res = 50
-
-
     keys_ = ["MinAtar/Asterix-v0__dqn__1 - charts/global_optimality_gap",
              "MinAtar/Asterix-v0__dqn__2 - charts/global_optimality_gap",
              "MinAtar/Asterix-v0__dqn__3 - charts/global_optimality_gap"]
