@@ -15,4 +15,5 @@ conda activate cleanrl
 echo $ALG
 echo $ENV_ID
 
-python $ALG --env-id $ENV_ID --track $INTRINSIC_REWARDS --wandb-project-name sub-optimality
+## srun is needed to run the multiple tasks per GPU
+srun python $ALG --env-id $ENV_ID --track $INTRINSIC_REWARDS --wandb-project-name sub-optimality
