@@ -4,7 +4,6 @@
 #SBATCH --partition=long                             # Ask for unkillable job
 #SBATCH --cpus-per-task=4                               # Ask for 2 CPUs
 #SBATCH --ntasks-per-gpu=3                            # Ask for 2 tasks per GPU 
-#SBATCH --ntasks-per-node=1    
 #SBATCH --gres=gpu:1                                    # Ask for GPUs
 #SBATCH --mem=96G                                        # Ask for 10 GB of RAM
 #SBATCH --time=5:55:00                                   # The job will run for 3 hours
