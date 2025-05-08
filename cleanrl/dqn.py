@@ -113,6 +113,11 @@ class QNetwork(nn.Module):
 
     def forward(self, x):
         return self.network(x)
+    
+    def get_action_deterministic(self, x):
+        q_values = self.forward(x)
+        actions = torch.argmax(q_values, dim=1)
+        return actions
 
 
 def linear_schedule(start_e: float, end_e: float, duration: int, t: int):
@@ -131,6 +136,7 @@ if __name__ == "__main__":
             """
         )
     args = tyro.cli(Args)
+    args.seed = int(os.environ.get("SLURM_PROCID", args.seed))
     assert args.num_envs == 1, "vectorized envs are not supported at the moment"
     run_name = f"{args.env_id}__{args.exp_name}__{args.seed}__{int(time.time())}"
     if args.track:
@@ -156,10 +162,6 @@ if __name__ == "__main__":
     np.random.seed(args.seed)
     torch.manual_seed(args.seed)
     torch.backends.cudnn.deterministic = args.torch_deterministic
-    #====================== optimality gap computation library ======================#
-    import buffer_gap
-    gap_stats = buffer_gap.BufferGapV2(args.return_buffer_size, args.top_return_buff_percentage)
-    #====================== optimality gap computation library ======================#
     device = torch.device("cuda" if torch.cuda.is_available() and args.cuda else "cpu")
 
     # env setup
@@ -176,6 +178,14 @@ if __name__ == "__main__":
     optimizer = optim.Adam(q_network.parameters(), lr=args.learning_rate)
     target_network = QNetwork(envs).to(device)
     target_network.load_state_dict(q_network.state_dict())
+
+    #====================== optimality gap computation library ======================#
+    import buffer_gap
+    eval_envs = gym.vector.SyncVectorEnv(
+        [make_env(args.env_id, args.seed + i, i, args.capture_video, run_name) for i in range(args.num_envs)]
+    )
+    gap_stats = buffer_gap.BufferGapV2(args.return_buffer_size, args.top_return_buff_percentage, q_network, device, args, eval_envs)
+    #====================== optimality gap computation library ======================#
 
     rb = ReplayBuffer(
         args.buffer_size,
@@ -265,7 +275,11 @@ if __name__ == "__main__":
                         writer.add_scalar("charts/rewards top 95%", torch.mean(torch.topk(data_.rewards.flatten(), 500)[0]), global_step)
                         # writer.add_scalar("charts/returns top 95%", torch.mean(torch.topk(data_.returns.flatten(), 500)[0]), global_step)
                     if args.intrinsic_rewards:
-                        writer.add_scalar("charts/intrinsic_rewards", intrinsic_rewards.mean(), global_step)
+                        ## Here we iterate over the irs.metrics disctionary
+                        for key, value in irs.metrics.items():
+                            writer.add_scalar(key, np.mean([val[1] for val in value]), global_step)
+                            irs.metrics[key] = []
+
 
                 # optimize the model
                 optimizer.zero_grad()

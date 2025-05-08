@@ -153,10 +153,17 @@ class Agent(nn.Module):
         if action is None:
             action = probs.sample()
         return action, probs.log_prob(action), probs.entropy(), self.critic(hidden)
+    
+    def get_action_deterministic(self, x):
+        hidden = self.network(x / 255.0)
+        logits = self.actor(hidden)
+        actions = torch.argmax(logits, dim=1)
+        return actions
 
 
 if __name__ == "__main__":
     args = tyro.cli(Args)
+    args.seed = int(os.environ.get("SLURM_PROCID", args.seed))
     args.batch_size = int(args.num_envs * args.num_steps)
     args.minibatch_size = int(args.batch_size // args.num_minibatches)
     args.num_iterations = args.total_timesteps // args.batch_size
@@ -185,11 +192,6 @@ if __name__ == "__main__":
     torch.manual_seed(args.seed)
     torch.backends.cudnn.deterministic = args.torch_deterministic
 
-    #====================== optimality gap computation library ======================#
-    import buffer_gap
-    gap_stats = buffer_gap.BufferGapV2(args.return_buffer_size, args.top_return_buff_percentage)
-    #====================== optimality gap computation library ======================#
-
     device = torch.device("cuda" if torch.cuda.is_available() and args.cuda else "cpu")
 
     # env setup
@@ -205,6 +207,14 @@ if __name__ == "__main__":
 
     agent = Agent(envs).to(device)
     optimizer = optim.Adam(agent.parameters(), lr=args.learning_rate, eps=1e-5)
+
+    #====================== optimality gap computation library ======================#
+    import buffer_gap
+    eval_envs = gym.vector.SyncVectorEnv(
+        [make_env(args.env_id, i, args.capture_video, run_name) for i in range(args.num_envs)]
+    )
+    gap_stats = buffer_gap.BufferGapV2(args.return_buffer_size, args.top_return_buff_percentage, agent, device, args, eval_envs)
+    #====================== optimality gap computation library ======================#
 
     # ALGO Logic: Storage setup
     obs = torch.zeros((args.num_steps, args.num_envs) + envs.single_observation_space.shape).to(device)

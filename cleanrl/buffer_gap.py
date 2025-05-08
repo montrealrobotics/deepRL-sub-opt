@@ -46,13 +46,17 @@ class BufferGap(ReplayBuffer):
         self.returns[self.pos] = np.array([info.get("return") for info in infos])
         super().add(obs, next_obs, action, reward, done, infos)
 
-import heapq, collections
+import heapq, collections, torch, gym
 
 class BufferGapV2():
 
     def __init__(self, 
         buffer_size: int,
         top_buffer_percet: float = 0.05,
+        policy = False, 
+        device = "auto", 
+        args = None,
+        envs = None,
     ):
         
         self._max_return = -100000
@@ -62,6 +66,14 @@ class BufferGapV2():
         self._top_buffer_percet = top_buffer_percet
         ## returns is a deque of the last 100 episodic returns
         self._returns = collections.deque(maxlen=buffer_size)
+
+        self._policy = policy
+        self._device = device
+
+        # env setup
+        self._envs = envs
+        self._args = args
+        self._last_eval = 0
 
 
     def add(self, return_: float):
@@ -95,5 +107,44 @@ class BufferGapV2():
         writer.add_scalar("charts/global_optimality_gap", np.mean(list(self._max_returns)) - np.mean(returns_), step)
         writer.add_scalar("charts/local_optimality_gap", np.mean(heapq.nlargest(max(int(self._top_buffer_percet * len(returns_)), 1), returns_)) - np.mean(returns_), step)
         
+        ## Get performance for the deterministic policy
+        if step - self._last_eval > 10000:
+            returns = self.eval_deterministic()
+            self._last_eval = step
+            writer.add_scalar("charts/deterministic returns", np.mean(returns), step)
+
+
+    def eval_deterministic(self) -> np.ndarray:
+        """
+        Evaluate the policy deterministically
+        """
+        self._envs.reset(seed=self._args.seed)
+        # q_values = self._policy(torch.Tensor(obs).to(self._device))
+        # actions = torch.argmax(q_values, dim=1).cpu().numpy()
+        returns = []
+        t=0
+        max_t = 1000
+        while t < max_t:
+            obs, _ = self._envs.reset()
+            return_ = 0.0
+            for i in range(max_t):
+                
+                actions = self._policy.get_action_deterministic(torch.Tensor(obs).to(self._device)).cpu().numpy()
+                
+                obs, rewards, terminations, truncations, infos = self._envs.step(actions)
+                
+                return_ += rewards
+                t += 1
+                # Check if the episode is done
+                if terminations.any() or truncations.any():
+                    break
+            returns.append(return_)
+
+        return np.mean(returns)
+
+        # TRY NOT TO MODIFY: execute the game and log data.
+        # next_obs, rewards, terminations, truncations, infos = self._envs.step(actions)
+        # return_ += rewards
+        # infos["return"] = return_
 
         
