@@ -24,7 +24,7 @@ from torch.utils.tensorboard import SummaryWriter
 # ===================== load the reward module ===================== #
 import sys
 sys.path.append("../")
-from rllte.xplore.reward import RND
+from rllte.xplore.reward import RND, E3B
 # ===================== load the reward module ===================== #
 
 @dataclass
@@ -55,7 +55,7 @@ class Args:
     # Algorithm specific arguments
     env_id: str = "SpaceInvadersNoFrameskip-v4"
     """the id of the environment"""
-    total_timesteps: int = 10000000
+    total_timesteps: int = 5000000
     """total timesteps of the experiments"""
     learning_rate: float = 1e-4
     """the learning rate of the optimizer"""
@@ -156,7 +156,7 @@ poetry run pip install "stable_baselines3==2.0.0a1" "gymnasium[atari,accept-rom-
 """
         )
     args = tyro.cli(Args)
-    args.seed = int(os.environ.get("SLURM_PROCID", args.seed))
+    args.seed = int(os.environ.get("SLURM_PROCID", args.seed)) * args.seed
     assert args.num_envs == 1, "vectorized envs are not supported at the moment"
     run_name = f"{args.env_id}__{args.exp_name}__{args.seed}__{int(time.time())}"
     if args.track:
