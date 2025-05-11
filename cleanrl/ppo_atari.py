@@ -24,7 +24,7 @@ from stable_baselines3.common.atari_wrappers import (  # isort:skip
 # ===================== load the reward module ===================== #
 import sys
 sys.path.append("../")
-from rllte.xplore.reward import RND
+from rllte.xplore.reward import RND, E3B
 # ===================== load the reward module ===================== #
 
 
@@ -90,7 +90,7 @@ class Args:
     """the mini-batch size (computed in runtime)"""
     num_iterations: int = 0
     """the number of iterations (computed in runtime)"""
-    intrinsic_rewards: bool = False
+    intrinsic_rewards: str = False
     """Whether to use intrinsic rewards"""
     top_return_buff_percentage: int = 0.05
     """The top percent of the buffer for computing the optimality gap"""
@@ -202,7 +202,8 @@ if __name__ == "__main__":
 
     # ===================== build the reward ===================== #
     if args.intrinsic_rewards:
-        irs = RND(envs=envs, device=device, beta=0.1)
+        klass = globals()[args.intrinsic_rewards]
+        irs = klass(envs=envs, device=device, beta=0.1)
     # ===================== build the reward ===================== #
 
     agent = Agent(envs).to(device)
@@ -383,7 +384,11 @@ if __name__ == "__main__":
         print("SPS:", int(global_step / (time.time() - start_time)))
         writer.add_scalar("charts/SPS", int(global_step / (time.time() - start_time)), global_step)
         if args.intrinsic_rewards:
-            writer.add_scalar("charts/intrinsic_rewards", intrinsic_rewards.mean(), global_step)
+            ## Here we iterate over the irs.metrics disctionary
+            for key, value in irs.metrics.items():
+                writer.add_scalar(key, np.mean([val[1] for val in value]), global_step)
+                irs.metrics[key] = []
+
 
     envs.close()
     writer.close()

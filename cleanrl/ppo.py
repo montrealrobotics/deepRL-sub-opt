@@ -82,7 +82,7 @@ class Args:
     """the mini-batch size (computed in runtime)"""
     num_iterations: int = 0
     """the number of iterations (computed in runtime)"""
-    intrinsic_rewards: bool = False
+    intrinsic_rewards: str = False
     """Whether to use intrinsic rewards"""
     top_return_buff_percentage: int = 0.95
     """The top percent of the buffer for computing the optimality gap"""
@@ -186,7 +186,8 @@ if __name__ == "__main__":
 
     # ===================== build the reward ===================== #
     if args.intrinsic_rewards:
-        irs = RND(envs=envs, device=device, encoder_model="flat", obs_norm_type="none", beta=0.1)
+        klass = globals()[args.intrinsic_rewards]
+        irs = klass(envs=envs, device=device, encoder_model="flat", obs_norm_type="none", beta=0.1)
     # ===================== build the reward ===================== #
 
     agent = Agent(envs).to(device)

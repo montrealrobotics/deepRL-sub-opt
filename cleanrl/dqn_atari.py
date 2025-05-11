@@ -81,7 +81,7 @@ class Args:
     """timestep to start learning"""
     train_frequency: int = 4
     """the frequency of training"""
-    intrinsic_rewards: bool = False
+    intrinsic_rewards: str = False
     """Whether to use intrinsic rewards"""
     top_return_buff_percentage: int = 0.05
     """The top percent of the buffer for computing the optimality gap"""
@@ -191,7 +191,8 @@ poetry run pip install "stable_baselines3==2.0.0a1" "gymnasium[atari,accept-rom-
     assert isinstance(envs.single_action_space, gym.spaces.Discrete), "only discrete action space is supported"
     # ===================== build the reward ===================== #
     if args.intrinsic_rewards:
-        irs = RND(envs=envs, device=device, beta=0.1)
+        klass = globals()[args.intrinsic_rewards]
+        irs = klass(envs=envs, device=device, beta=0.1)
     # ===================== build the reward ===================== #
     
     q_network = QNetwork(envs).to(device)
