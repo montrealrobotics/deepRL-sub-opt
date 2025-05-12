@@ -30,5 +30,6 @@
 # sbatch --array=1-2 --export=ALL,ALG='cleanrl/ppo_atari.py',ENV_ID='MontezumaRevengeNoFrameskip-v4' launchGPU.sh
 # sbatch --array=1-2 --export=ALL,ALG='cleanrl/ppo_atari.py',ENV_ID='SpaceInvadersNoFrameskip-v4',INTRINSIC_REWARDS='--intrinsic_rewards E3B' launchGPU.sh
 # sbatch --array=1-2 --export=ALL,ALG='cleanrl/ppo_atari.py',ENV_ID='AsterixNoFrameskip-v4',INTRINSIC_REWARDS='--intrinsic_rewards E3B' launchGPU.sh
-sbatch --array=1-2 --export=ALL,ALG='cleanrl/ppo_atari.py',ENV_ID='MontezumaRevengeNoFrameskip-v4',INTRINSIC_REWARDS='--intrinsic_rewards E3B' launchGPU.sh
+# sbatch --array=1-2 --export=ALL,ALG='cleanrl/ppo_atari.py',ENV_ID='MontezumaRevengeNoFrameskip-v4',INTRINSIC_REWARDS='--intrinsic_rewards E3B' launchGPU.sh
+sbatch --array=1-2 --export=ALL,ALG='cleanrl/ppo_atari.py',ENV_ID='MontezumaRevengeNoFrameskip-v4',ARGSS='--network_type ResNet' launchGPU.sh
 

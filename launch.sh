@@ -13,5 +13,5 @@ conda activate cleanrl
 
 echo $ALG
 echo $ENV_ID
-
+echo $ARGSS
 python $ALG --seed $SLURM_ARRAY_TASK_ID --env-id $ENV_ID --track $INTRINSIC_REWARDS --wandb-project-name sub-optimality

@@ -96,6 +96,8 @@ class Args:
     """The top percent of the buffer for computing the optimality gap"""
     return_buffer_size: int = 1000
     """The size of the return buffer for computing the optimality gap"""
+    network_type: str = False
+    """The type of the network to use"""
 
 
 def make_env(env_id, idx, capture_video, run_name):
@@ -129,17 +131,21 @@ def layer_init(layer, std=np.sqrt(2), bias_const=0.0):
 class Agent(nn.Module):
     def __init__(self, envs):
         super().__init__()
-        self.network = nn.Sequential(
-            layer_init(nn.Conv2d(4, 32, 8, stride=4)),
-            nn.ReLU(),
-            layer_init(nn.Conv2d(32, 64, 4, stride=2)),
-            nn.ReLU(),
-            layer_init(nn.Conv2d(64, 64, 3, stride=1)),
-            nn.ReLU(),
-            nn.Flatten(),
-            layer_init(nn.Linear(64 * 7 * 7, 512)),
-            nn.ReLU(),
-        )
+        if args.network_type:
+            from resnet import ResNet18
+            self.network = ResNet18(num_classes=512)   
+        else:
+            self.network = nn.Sequential(
+                layer_init(nn.Conv2d(4, 32, 8, stride=4)),
+                nn.ReLU(),
+                layer_init(nn.Conv2d(32, 64, 4, stride=2)),
+                nn.ReLU(),
+                layer_init(nn.Conv2d(64, 64, 3, stride=1)),
+                nn.ReLU(),
+                nn.Flatten(),
+                layer_init(nn.Linear(64 * 7 * 7, 512)),
+                nn.ReLU(),
+            )
         self.actor = layer_init(nn.Linear(512, envs.single_action_space.n), std=0.01)
         self.critic = layer_init(nn.Linear(512, 1), std=1)
 
