@@ -6,7 +6,7 @@
 #SBATCH --ntasks=2                                      # Ask for 2 tasks per GPU 
 #SBATCH --gres=gpu:1                                    # Ask for GPUs
 #SBATCH --mem=64G                                       # Ask for 10 GB of RAM
-#SBATCH --time=5:55:00                                  # The job will run for 3 hours
+#SBATCH --time=11:55:00                                  # The job will run for 3 hours
 
 #SBATCH -o /network/scratch/g/glen.berseth/slurm-%j.out  # Write the log on scratch
 
