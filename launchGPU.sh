@@ -17,4 +17,4 @@ echo $ALG
 echo $ENV_ID
 
 ## srun is needed to run the multiple tasks per GPU
-srun python $ALG --seed $SLURM_ARRAY_TASK_ID --env-id $ENV_ID --track $INTRINSIC_REWARDS --wandb-project-name sub-optimality $ARGSS
+srun python $ALG --env-id $ENV_ID --track $INTRINSIC_REWARDS --wandb-project-name sub-optimality $ARGSS

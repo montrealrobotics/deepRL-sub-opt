@@ -87,6 +87,8 @@ class Args:
     """The top percent of the buffer for computing the optimality gap"""
     return_buffer_size: int = 1000
     """The size of the return buffer for computing the optimality gap"""
+    network_type: str = False
+    """The type of the network to use"""
 
 
 def make_env(env_id, seed, idx, capture_video, run_name):
@@ -118,6 +120,23 @@ def make_env(env_id, seed, idx, capture_video, run_name):
 class QNetwork(nn.Module):
     def __init__(self, env):
         super().__init__()
+        if args.network_type:
+            from resnet import ResNet18
+            self.network = ResNet18(num_classes=512)
+            self.network.fc = nn.Linear(512, env.single_action_space.n)   
+        else:
+            self.network = nn.Sequential(
+                layer_init(nn.Conv2d(4, 32, 8, stride=4)),
+                nn.ReLU(),
+                layer_init(nn.Conv2d(32, 64, 4, stride=2)),
+                nn.ReLU(),
+                layer_init(nn.Conv2d(64, 64, 3, stride=1)),
+                nn.ReLU(),
+                nn.Flatten(),
+                layer_init(nn.Linear(64 * 7 * 7, 512)),
+                nn.ReLU(),
+            )
+                
         self.network = nn.Sequential(
             nn.Conv2d(4, 32, 8, stride=4),
             nn.ReLU(),
