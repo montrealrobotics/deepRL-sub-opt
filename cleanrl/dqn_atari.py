@@ -122,33 +122,28 @@ class QNetwork(nn.Module):
         super().__init__()
         if args.network_type:
             from resnet import ResNet18
-            self.network = ResNet18(num_classes=512)
-            self.network.fc = nn.Linear(512, env.single_action_space.n)   
+            print("Using ResNet18")
+            self.network_ = ResNet18(num_classes=512)
+            self.head = nn.Linear(512, env.single_action_space.n)   
+            self.network = nn.Sequential(
+                self.network_,
+                self.head,
+            )
         else:
             self.network = nn.Sequential(
-                layer_init(nn.Conv2d(4, 32, 8, stride=4)),
+                nn.Conv2d(4, 32, 8, stride=4),
                 nn.ReLU(),
-                layer_init(nn.Conv2d(32, 64, 4, stride=2)),
+                nn.Conv2d(32, 64, 4, stride=2),
                 nn.ReLU(),
-                layer_init(nn.Conv2d(64, 64, 3, stride=1)),
+                nn.Conv2d(64, 64, 3, stride=1),
                 nn.ReLU(),
                 nn.Flatten(),
-                layer_init(nn.Linear(64 * 7 * 7, 512)),
+                nn.Linear(3136, 512),
                 nn.ReLU(),
+                nn.Linear(512, env.single_action_space.n),
             )
+            
                 
-        self.network = nn.Sequential(
-            nn.Conv2d(4, 32, 8, stride=4),
-            nn.ReLU(),
-            nn.Conv2d(32, 64, 4, stride=2),
-            nn.ReLU(),
-            nn.Conv2d(64, 64, 3, stride=1),
-            nn.ReLU(),
-            nn.Flatten(),
-            nn.Linear(3136, 512),
-            nn.ReLU(),
-            nn.Linear(512, env.single_action_space.n),
-        )
 
     def forward(self, x):
         return self.network(x / 255.0)
