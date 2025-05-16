@@ -83,7 +83,7 @@ class Args:
     """the mini-batch size (computed in runtime)"""
     num_iterations: int = 0
     """the number of iterations (computed in runtime)"""
-    intrinsic_rewards: bool = True
+    intrinsic_rewards: bool = False
     """Whether to use intrinsic rewards"""
     top_return_buff_percentage: int = 0.95
     """The top percent of the buffer for computing the optimality gap"""
@@ -147,6 +147,10 @@ class Agent(nn.Module):
         if action is None:
             action = probs.sample()
         return action, probs.log_prob(action).sum(1), probs.entropy().sum(1), self.critic(x)
+    
+    def get_action_deterministic(self, x):
+        actions = self.actor_mean(x).detach()
+        return actions
 
 
 if __name__ == "__main__":
@@ -155,10 +159,6 @@ if __name__ == "__main__":
     args.minibatch_size = int(args.batch_size // args.num_minibatches)
     args.num_iterations = args.total_timesteps // args.batch_size
     run_name = f"{args.env_id}__{args.exp_name}__{args.seed}__{int(time.time())}"
-    #====================== optimality gap computation library ======================#
-    import buffer_gap
-    gap_stats = buffer_gap.BufferGapV2(args.return_buffer_size, args.top_return_buff_percentage)
-    #====================== optimality gap computation library ======================#
     if args.track:
         import wandb
 
@@ -187,15 +187,30 @@ if __name__ == "__main__":
     max_returns = []
 
     device = torch.device("cuda" if torch.cuda.is_available() and args.cuda else "cpu")
+    
 
     # env setup
     envs = gym.vector.SyncVectorEnv(
         [make_env(args.env_id, i, args.capture_video, run_name, args.gamma) for i in range(args.num_envs)]
     )
     assert isinstance(envs.single_action_space, gym.spaces.Box), "only continuous action space is supported"
+    # ===================== build the reward ===================== #
+    if args.intrinsic_rewards:
+        from rllte.xplore.reward import RND, E3B
+        klass = globals()[args.intrinsic_rewards]
+        irs = klass(envs=envs, device=device, encoder_model="flat", obs_norm_type="none", beta=0.1)
+    # ===================== build the reward ===================== #
 
     agent = Agent(envs).to(device)
     optimizer = optim.Adam(agent.parameters(), lr=args.learning_rate, eps=1e-5)
+
+    #====================== optimality gap computation library ======================#
+    import buffer_gap
+    eval_envs = gym.vector.SyncVectorEnv(
+        [make_env(args.env_id, i, args.capture_video, run_name, args.gamma) for i in range(args.num_envs)]
+    )
+    gap_stats = buffer_gap.BufferGapV2(args.return_buffer_size, args.top_return_buff_percentage, agent, device, args, eval_envs)
+    #====================== optimality gap computation library ======================#
 
     # ALGO Logic: Storage setup
     obs = torch.zeros((args.num_steps, args.num_envs) + envs.single_observation_space.shape).to(device)
@@ -231,11 +246,18 @@ if __name__ == "__main__":
             actions[step] = action
             logprobs[step] = logprob
 
+
             # TRY NOT TO MODIFY: execute the game and log data.
             next_obs, reward, terminations, truncations, infos = envs.step(action.cpu().numpy())
             next_done = np.logical_or(terminations, truncations)
             rewards[step] = torch.tensor(reward).to(device).view(-1)
             next_obs, next_done = torch.Tensor(next_obs).to(device), torch.Tensor(next_done).to(device)
+            # ===================== watch the interaction ===================== #
+            if args.intrinsic_rewards:
+                irs.watch(observations=obs[step], actions=actions[step], 
+                      rewards=rewards[step], terminateds=dones[step], 
+                      truncateds=dones[step], next_observations=next_obs)
+            # ===================== watch the interaction ===================== #
 
             if "final_info" in infos:
                 for info in infos["final_info"]:
@@ -248,6 +270,19 @@ if __name__ == "__main__":
                         gap_stats.plot_gap(writer, global_step)
                         #====================== optimality gap computation logging ======================#
 
+        # ===================== compute the intrinsic rewards ===================== #
+        # get real next observations
+        if args.intrinsic_rewards:
+            real_next_obs = obs.clone()
+            real_next_obs[:-1] = obs[1:]
+            real_next_obs[-1] = next_obs
+
+            intrinsic_rewards = irs.compute(samples=dict(observations=obs, actions=actions, 
+                                                        rewards=rewards, terminateds=dones,
+                                                        truncateds=dones, next_observations=real_next_obs
+                                                        ))
+            rewards += intrinsic_rewards
+        # ===================== compute the intrinsic rewards ===================== #
         # bootstrap value if not done
         with torch.no_grad():
             next_value = agent.get_value(next_obs).reshape(1, -1)
@@ -341,6 +376,11 @@ if __name__ == "__main__":
         writer.add_scalar("losses/explained_variance", explained_var, global_step)
         print("SPS:", int(global_step / (time.time() - start_time)))
         writer.add_scalar("charts/SPS", int(global_step / (time.time() - start_time)), global_step)
+        if args.intrinsic_rewards:
+            ## Here we iterate over the irs.metrics disctionary
+            for key, value in irs.metrics.items():
+                writer.add_scalar(key, np.mean([val[1] for val in value]), global_step)
+                irs.metrics[key] = []
 
     if args.save_model:
         model_path = f"runs/{run_name}/{args.exp_name}.cleanrl_model"

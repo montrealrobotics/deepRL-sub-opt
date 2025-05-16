@@ -3,10 +3,10 @@
 
 #SBATCH --partition=long                                # Ask for unkillable job
 #SBATCH --cpus-per-task=4                               # Ask for 2 CPUs
-#SBATCH --ntasks=2                                      # Ask for 2 tasks per GPU 
+#SBATCH --ntasks=1                                      # Ask for 2 tasks per GPU 
 #SBATCH --gres=gpu:1                                    # Ask for GPUs
 #SBATCH --mem=64G                                       # Ask for 10 GB of RAM
-#SBATCH --time=11:55:00                                  # The job will run for 3 hours
+#SBATCH --time=23:55:00                                  # The job will run for 3 hours
 
 #SBATCH -o /network/scratch/g/glen.berseth/slurm-%j.out  # Write the log on scratch
 
@@ -17,4 +17,4 @@ echo $ALG
 echo $ENV_ID
 
 ## srun is needed to run the multiple tasks per GPU
-srun python $ALG --env-id $ENV_ID --track $INTRINSIC_REWARDS --wandb-project-name sub-optimality $ARGSS
+python $ALG --seed $SLURM_ARRAY_TASK_ID --env-id $ENV_ID --track $INTRINSIC_REWARDS --wandb-project-name sub-optimality $ARGSS

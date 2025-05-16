@@ -16,7 +16,7 @@ from torch.utils.tensorboard import SummaryWriter
 # ===================== load the reward module ===================== #
 import sys
 sys.path.append("../")
-from rllte.xplore.reward import RND
+from rllte.xplore.reward import RND, E3B
 # ===================== load the reward module ===================== #
 import buffer_gap
 
