@@ -172,7 +172,8 @@ poetry run pip install "stable_baselines3==2.0.0a1" "gymnasium[atari,accept-rom-
     args = tyro.cli(Args)
     args.seed = int(os.environ.get("SLURM_PROCID", args.seed)) * args.seed
     assert args.num_envs == 1, "vectorized envs are not supported at the moment"
-    run_name = f"{args.env_id}__{args.exp_name}__{args.seed}__{int(time.time())}"
+    jod_id = int(os.environ.get("SLURM_JOB_ID", 0)) * args.seed
+    run_name = f"{args.env_id}__{args.exp_name}__{args.seed}__{jod_id}__{int(time.time())}"
     if args.track:
         import wandb
 

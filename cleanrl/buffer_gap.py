@@ -111,7 +111,7 @@ class BufferGapV2():
         if step - self._last_eval > 10000:
             returns = self.eval_deterministic()
             self._last_eval = step
-            writer.add_scalar("charts/deterministic returns", np.mean(returns), step)
+            writer.add_scalar("charts/deterministic_returns", np.mean(returns), step)
 
 
     def eval_deterministic(self) -> np.ndarray:
