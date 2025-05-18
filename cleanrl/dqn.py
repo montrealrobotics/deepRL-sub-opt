@@ -81,6 +81,10 @@ class Args:
     """The top percent of the buffer for computing the optimality gap"""
     return_buffer_size: int = 1000
     """The size of the return buffer for computing the optimality gap"""
+    log_dir: str = False
+    """The directory to save the logs"""
+    job_id : int = 0
+    """The job id for the slurm job"""
 
 
 def make_env(env_id, seed, idx, capture_video, run_name):
@@ -138,7 +142,7 @@ if __name__ == "__main__":
     args = tyro.cli(Args)
     args.seed = int(os.environ.get("SLURM_PROCID", args.seed))
     assert args.num_envs == 1, "vectorized envs are not supported at the moment"
-    run_name = f"{args.env_id}__{args.exp_name}__{args.seed}__{int(time.time())}"
+    run_name = f"{args.env_id}__{args.exp_name}__{args.job_id}__{args.seed}__{int(time.time())}"
     if args.track:
         import wandb
 
@@ -151,7 +155,10 @@ if __name__ == "__main__":
             monitor_gym=True,
             save_code=True,
         )
-    writer = SummaryWriter(f"runs/{run_name}")
+    if args.log_dir:
+        writer = SummaryWriter(args.log_dir+f"runs/{run_name}")    
+    else:
+        writer = SummaryWriter(f"runs/{run_name}")
     writer.add_text(
         "hyperparameters",
         "|param|value|\n|-|-|\n%s" % ("\n".join([f"|{key}|{value}|" for key, value in vars(args).items()])),

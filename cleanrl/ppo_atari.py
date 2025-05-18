@@ -98,6 +98,10 @@ class Args:
     """The size of the return buffer for computing the optimality gap"""
     network_type: str = False
     """The type of the network to use"""
+    log_dir: str = False
+    """The directory to save the logs"""
+    job_id : int = 0
+    """The job id for the slurm job"""
 
 
 def make_env(env_id, idx, capture_video, run_name):
@@ -173,8 +177,7 @@ if __name__ == "__main__":
     args.batch_size = int(args.num_envs * args.num_steps)
     args.minibatch_size = int(args.batch_size // args.num_minibatches)
     args.num_iterations = args.total_timesteps // args.batch_size
-    jod_id = int(os.environ.get("SLURM_JOB_ID", 0)) * args.seed
-    run_name = f"{args.env_id}__{args.exp_name}__{args.seed}__{jod_id}__{int(time.time())}"
+    run_name = f"{args.env_id}__{args.exp_name}__{args.job_id}__{args.seed}__{int(time.time())}"
     print(run_name)
     if args.track:
         import wandb
@@ -188,7 +191,10 @@ if __name__ == "__main__":
             monitor_gym=True,
             save_code=True,
         )
-    writer = SummaryWriter(f"runs/{run_name}")
+    if args.log_dir:
+        writer = SummaryWriter(args.log_dir+f"runs/{run_name}")    
+    else:
+        writer = SummaryWriter(f"runs/{run_name}")
     writer.add_text(
         "hyperparameters",
         "|param|value|\n|-|-|\n%s" % ("\n".join([f"|{key}|{value}|" for key, value in vars(args).items()])),
