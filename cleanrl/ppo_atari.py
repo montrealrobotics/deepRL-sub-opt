@@ -173,7 +173,7 @@ class Agent(nn.Module):
 
 if __name__ == "__main__":
     args = tyro.cli(Args)
-    args.seed = int(os.environ.get("SLURM_PROCID", args.seed)) * args.seed
+    # args.seed = int(os.environ.get("SLURM_PROCID", args.seed)) * args.seed
     args.batch_size = int(args.num_envs * args.num_steps)
     args.minibatch_size = int(args.batch_size // args.num_minibatches)
     args.num_iterations = args.total_timesteps // args.batch_size
