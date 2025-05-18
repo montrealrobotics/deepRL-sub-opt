@@ -93,6 +93,8 @@ class Args:
     """The directory to save the logs"""
     job_id : int = 0
     """The job id for the slurm job"""
+    intrinsic_reward_scale: float = 1.0
+    """The scale of the intrinsic reward"""
 
 
 def make_env(env_id, seed, idx, capture_video, run_name):
@@ -213,7 +215,7 @@ poetry run pip install "stable_baselines3==2.0.0a1" "gymnasium[atari,accept-rom-
     # ===================== build the reward ===================== #
     if args.intrinsic_rewards:
         klass = globals()[args.intrinsic_rewards]
-        irs = klass(envs=envs, device=device, beta=0.1)
+        irs = klass(envs=envs, device=device, beta=args.intrinsic_reward_scale)
     # ===================== build the reward ===================== #
     
     q_network = QNetwork(envs).to(device)

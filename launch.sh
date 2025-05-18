@@ -5,7 +5,7 @@
 #SBATCH --cpus-per-task=4                               # Ask for 2 CPUs
 #SBATCH --ntasks-per-node=1                            # Ask for 2 tasks per Node (good for CPU nodes)
 #SBATCH --mem=16G                                        # Ask for 10 GB of RAM
-#SBATCH --time=5:55:00                                   # The job will run for 3 hours
+#SBATCH --time=11:55:00                                   # The job will run for 3 hours
 #SBATCH -o /network/scratch/g/glen.berseth/slurm-%j.out  # Write the log on scratch
 
 module load cudatoolkit/12.1 miniconda/3

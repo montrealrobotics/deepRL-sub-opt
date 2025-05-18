@@ -92,6 +92,8 @@ class Args:
     """The directory to save the logs"""
     job_id : int = 0
     """The job id for the slurm job"""
+    intrinsic_reward_scale: float = 1.0
+    """The scale of the intrinsic reward"""
 
 
 def make_env(env_id, idx, capture_video, run_name):
@@ -195,7 +197,7 @@ if __name__ == "__main__":
     # ===================== build the reward ===================== #
     if args.intrinsic_rewards:
         klass = globals()[args.intrinsic_rewards]
-        irs = klass(envs=envs, device=device, encoder_model="flat", obs_norm_type="none", beta=0.1)
+        irs = klass(envs=envs, device=device, encoder_model="flat", obs_norm_type="none", beta=args.intrinsic_reward_scale)
     # ===================== build the reward ===================== #
 
     agent = Agent(envs).to(device)

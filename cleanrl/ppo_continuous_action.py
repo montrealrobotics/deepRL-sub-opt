@@ -41,7 +41,7 @@ class Args:
     """the user or org name of the model repository from the Hugging Face Hub"""
 
     # Algorithm specific arguments
-    env_id: str = "HalfCheetah-v4"
+    env_id: str = "BipedalWalker-v3"
     """the id of the environment"""
     total_timesteps: int = 10000000
     """total timesteps of the experiments"""
@@ -83,7 +83,7 @@ class Args:
     """the mini-batch size (computed in runtime)"""
     num_iterations: int = 0
     """the number of iterations (computed in runtime)"""
-    intrinsic_rewards: bool = False
+    intrinsic_rewards: str = False
     """Whether to use intrinsic rewards"""
     top_return_buff_percentage: int = 0.95
     """The top percent of the buffer for computing the optimality gap"""
@@ -93,6 +93,8 @@ class Args:
     """The directory to save the logs"""
     job_id : int = 0
     """The job id for the slurm job"""
+    intrinsic_reward_scale: float = 1.0
+    """The scale of the intrinsic reward"""
 
 
 
@@ -206,7 +208,7 @@ if __name__ == "__main__":
     if args.intrinsic_rewards:
         from rllte.xplore.reward import RND, E3B
         klass = globals()[args.intrinsic_rewards]
-        irs = klass(envs=envs, device=device, encoder_model="flat", obs_norm_type="none", beta=0.1)
+        irs = klass(envs=envs, device=device, beta=args.intrinsic_reward_scale)
     # ===================== build the reward ===================== #
 
     agent = Agent(envs).to(device)

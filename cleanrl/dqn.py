@@ -47,7 +47,7 @@ class Args:
     """the user or org name of the model repository from the Hugging Face Hub"""
 
     # Algorithm specific arguments
-    env_id: str = "MinAtar/SpaceInvaders-v0"
+    env_id: str = "MinAtar/Seaquest-v1"
     """the id of the environment"""
     total_timesteps: int = 10000000
     """total timesteps of the experiments"""
@@ -85,6 +85,8 @@ class Args:
     """The directory to save the logs"""
     job_id : int = 0
     """The job id for the slurm job"""
+    intrinsic_reward_scale: float = 1.0
+    """The scale of the intrinsic reward"""
 
 
 def make_env(env_id, seed, idx, capture_video, run_name):
@@ -140,7 +142,7 @@ if __name__ == "__main__":
             """
         )
     args = tyro.cli(Args)
-    args.seed = int(os.environ.get("SLURM_PROCID", args.seed))
+    # args.seed = int(os.environ.get("SLURM_PROCID", args.seed))
     assert args.num_envs == 1, "vectorized envs are not supported at the moment"
     run_name = f"{args.env_id}__{args.exp_name}__{args.job_id}__{args.seed}__{int(time.time())}"
     if args.track:
@@ -180,7 +182,7 @@ if __name__ == "__main__":
     # ===================== build the reward ===================== #
     if args.intrinsic_rewards:
         klass = globals()[args.intrinsic_rewards]
-        irs = klass(envs=envs, device=device, encoder_model="flat", obs_norm_type="none", beta=0.1)
+        irs = klass(envs=envs, device=device, encoder_model="flat", obs_norm_type="none", beta=args.intrinsic_reward_scale)
     # ===================== build the reward ===================== #
     q_network = QNetwork(envs).to(device)
     optimizer = optim.Adam(q_network.parameters(), lr=args.learning_rate)
