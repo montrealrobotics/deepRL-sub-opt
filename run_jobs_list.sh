@@ -26,20 +26,22 @@ strings=(
 )
 for env in "${strings[@]}"; do
     # echo "$env"
-    sbatch --array=1-4 --export=ALL,ALG='cleanrl/ppo_continuous_action.py',ENV_ID=$env,ARGSS='--total_timesteps 10000000' launch.sh
+    # sbatch --array=1-4 --export=ALL,ALG='cleanrl/ppo_continuous_action.py',ENV_ID=$env,ARGSS='--total_timesteps 10000000' launch.sh
+    sbatch --array=1-4 --export=ALL,ALG='cleanrl/ppo_continuous_action.py',ENV_ID=$env,ARGSS='--intrinsic_rewards RND --intrinsic_reward_scale=0.2 --num_envs 8 --total_timesteps 10000000' launch.sh
+    sbatch --array=1-4 --export=ALL,ALG='cleanrl/ppo_continuous_action.py',ENV_ID=$env,ARGSS='--intrinsic_rewards RND --intrinsic_reward_scale=0.5 --num_envs 8 --total_timesteps 10000000' launch.sh
 done
 
 ## Atari RL envs
-strings=(
-    "MontezumaRevengeNoFrameskip-v4"
-    "AsterixNoFrameskip-v4"
-    "SpaceInvadersNoFrameskip-v4"
-    "PitfallNoFrameskip-v0"
-)
-for env in "${strings[@]}"; do
-    # echo "$env"
-    sbatch --array=1-4 --export=ALL,ALG='cleanrl/dqn_atari.py',ENV_ID=$env,ARGSS='--total_timesteps 20000000 --intrinsic_rewards RND --intrinsic_reward_scale=0.5' launchGPU.sh
-    sbatch --array=1-4 --export=ALL,ALG='cleanrl/dqn_atari.py',ENV_ID=$env,ARGSS='--total_timesteps 20000000 --intrinsic_rewards RND --intrinsic_reward_scale=0.2' launchGPU.sh
-    sbatch --array=1-4 --export=ALL,ALG='cleanrl/ppo_atari.py',ENV_ID=$env,ARGSS='--total_timesteps 25000000 --intrinsic_rewards RND --intrinsic_reward_scale=0.5' launchGPU.sh
-    sbatch --array=1-4 --export=ALL,ALG='cleanrl/ppo_atari.py',ENV_ID=$env,ARGSS='--total_timesteps 25000000 --intrinsic_rewards RND --intrinsic_reward_scale=0.2' launchGPU.sh
-done
+# strings=(
+#     "MontezumaRevengeNoFrameskip-v4"
+#     "AsterixNoFrameskip-v4"
+#     "SpaceInvadersNoFrameskip-v4"
+#     "PitfallNoFrameskip-v0"
+# )
+# for env in "${strings[@]}"; do
+#     # echo "$env"
+#     sbatch --array=1-4 --export=ALL,ALG='cleanrl/dqn_atari.py',ENV_ID=$env,ARGSS='--total_timesteps 20000000 --intrinsic_rewards RND --intrinsic_reward_scale=0.5' launchGPU.sh
+#     sbatch --array=1-4 --export=ALL,ALG='cleanrl/dqn_atari.py',ENV_ID=$env,ARGSS='--total_timesteps 20000000 --intrinsic_rewards RND --intrinsic_reward_scale=0.2' launchGPU.sh
+#     sbatch --array=1-4 --export=ALL,ALG='cleanrl/ppo_atari.py',ENV_ID=$env,ARGSS='--total_timesteps 25000000 --intrinsic_rewards RND --intrinsic_reward_scale=0.5' launchGPU.sh
+#     sbatch --array=1-4 --export=ALL,ALG='cleanrl/ppo_atari.py',ENV_ID=$env,ARGSS='--total_timesteps 25000000 --intrinsic_rewards RND --intrinsic_reward_scale=0.2' launchGPU.sh
+# done
