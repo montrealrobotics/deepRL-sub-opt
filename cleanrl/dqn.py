@@ -156,6 +156,7 @@ if __name__ == "__main__":
             name=run_name,
             monitor_gym=True,
             save_code=True,
+            dir=args.log_dir+f"wandb/{run_name}"
         )
     if args.log_dir:
         writer = SummaryWriter(args.log_dir+f"runs/{run_name}")    
