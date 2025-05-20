@@ -5,7 +5,9 @@
 strings=(
     "MinAtar/SpaceInvaders-v0"
     "MinAtar/Asterix-v0"
+    "MinAtar/Breakout-v0"
     "MinAtar/Seaquest-v0"
+    "MinAtar/Freeway-v0"
     "LunarLander-v2"
 )
 for env in "${strings[@]}"; do
@@ -36,7 +38,10 @@ done
 #     "MontezumaRevengeNoFrameskip-v4"
 #     "AsterixNoFrameskip-v4"
 #     "SpaceInvadersNoFrameskip-v4"
-#     "PitfallNoFrameskip-v0"
+#     "PitfallNoFrameskip-v4"
+#     "BattleZoneNoFrameskip-v4"
+#     "NameThisGameNoFrameskip-v4"
+#     "PhoenixNoFrameskip-v4"
 # )
 # for env in "${strings[@]}"; do
 #     # echo "$env"

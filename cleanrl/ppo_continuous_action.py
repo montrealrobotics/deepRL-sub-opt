@@ -41,13 +41,13 @@ class Args:
     """the user or org name of the model repository from the Hugging Face Hub"""
 
     # Algorithm specific arguments
-    env_id: str = "BipedalWalker-v3"
+    env_id: str = "HalfCheetah-v4"
     """the id of the environment"""
     total_timesteps: int = 10000000
     """total timesteps of the experiments"""
     learning_rate: float = 3e-4
     """the learning rate of the optimizer"""
-    num_envs: int = 8
+    num_envs: int = 4
     """the number of parallel game environments"""
     num_steps: int = 2048
     """the number of steps to run in each environment per policy rollout"""
@@ -105,8 +105,9 @@ def make_env(env_id, idx, capture_video, run_name, gamma):
             env = gym.wrappers.RecordVideo(env, f"videos/{run_name}")
         else:
             env = gym.make(env_id)
-        env = gym.wrappers.FlattenObservation(env)  # deal with dm_control's Dict observation space
-        env = gym.wrappers.RecordEpisodeStatistics(env)
+        env = gym.wrappers.FlattenObservation(env)  # deal with dm_control's Dict observation 
+        import buffer_gap
+        env = buffer_gap.RecordEpisodeStatisticsV2(env)
         env = gym.wrappers.ClipAction(env)
         env = gym.wrappers.NormalizeObservation(env)
         env = gym.wrappers.TransformObservation(env, lambda obs: np.clip(obs, -10, 10))
@@ -277,7 +278,7 @@ if __name__ == "__main__":
                         writer.add_scalar("charts/episodic_return", info["episode"]["r"], global_step)
                         writer.add_scalar("charts/episodic_length", info["episode"]["l"], global_step)
                         #====================== optimality gap computation logging ======================#
-                        gap_stats.add(info["episode"]["r"])
+                        gap_stats.add(info["episode"])
                         gap_stats.plot_gap(writer, global_step)
                         #====================== optimality gap computation logging ======================#
 

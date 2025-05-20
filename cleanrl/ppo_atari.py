@@ -26,7 +26,7 @@ import sys
 sys.path.append("../")
 from rllte.xplore.reward import RND, E3B
 # ===================== load the reward module ===================== #
-
+import buffer_gap
 
 @dataclass
 class Args:
@@ -48,7 +48,7 @@ class Args:
     """whether to capture videos of the agent performances (check out `videos` folder)"""
 
     # Algorithm specific arguments
-    env_id: str = "PitfallNoFrameskip-v0"
+    env_id: str = "PhoenixNoFrameskip-v4"
     """the id of the environment"""
     total_timesteps: int = 10000000
     """total timesteps of the experiments"""
@@ -113,10 +113,11 @@ def make_env(env_id, idx, capture_video, run_name):
             env = gym.wrappers.RecordVideo(env, f"videos/{run_name}")
         else:
             env = gym.make(env_id)
-        env = gym.wrappers.RecordEpisodeStatistics(env)
-        env = NoopResetEnv(env, noop_max=30)
+        import buffer_gap
+        env = buffer_gap.RecordEpisodeStatisticsV2(env)
+        # env = NoopResetEnv(env, noop_max=30)
         env = MaxAndSkipEnv(env, skip=4)
-        env = EpisodicLifeEnv(env)
+        # env = EpisodicLifeEnv(env)
         if "FIRE" in env.unwrapped.get_action_meanings():
             env = FireResetEnv(env)
         env = ClipRewardEnv(env)
@@ -289,7 +290,7 @@ if __name__ == "__main__":
                         writer.add_scalar("charts/episodic_return", info["episode"]["r"], global_step)
                         writer.add_scalar("charts/episodic_length", info["episode"]["l"], global_step)
                         #====================== optimality gap computation logging ======================#
-                        gap_stats.add(info["episode"]["r"])
+                        gap_stats.add(info["episode"])
                         gap_stats.plot_gap(writer, global_step)
                         #====================== optimality gap computation logging ======================#
 
