@@ -13,10 +13,10 @@ strings=(
 for env in "${strings[@]}"; do
     # echo "$env"
     sbatch --array=1-4 --export=ALL,ALG='cleanrl/dqn.py',ENV_ID=$env,ARGSS='--total_timesteps 25000000 --intrinsic_reward_scale=0.2' launch.sh
-    sbatch --array=1-4 --export=ALL,ALG='cleanrl/ppo.py',ENV_ID=$env,ARGSS='--total_timesteps 25000000 --intrinsic_reward_scale=0.2' launch.sh
+    sbatch --array=1-4 --export=ALL,ALG='cleanrl/ppo.py',ENV_ID=$env,ARGSS='--total_timesteps 25000000 --num_envs 4 --intrinsic_reward_scale=0.2' launch.sh
 
     sbatch --array=1-4 --export=ALL,ALG='cleanrl/dqn.py',ENV_ID=$env,INTRINSIC_REWARDS='--intrinsic_rewards RND',ARGSS='--total_timesteps 25000000 --intrinsic_reward_scale=0.2' launch.sh
-    sbatch --array=1-4 --export=ALL,ALG='cleanrl/ppo.py',ENV_ID=$env,INTRINSIC_REWARDS='--intrinsic_rewards E3B',ARGSS='--total_timesteps 25000000 --intrinsic_reward_scale=0.2' launch.sh
+    sbatch --array=1-4 --export=ALL,ALG='cleanrl/ppo.py',ENV_ID=$env,INTRINSIC_REWARDS='--intrinsic_rewards E3B',ARGSS='--total_timesteps 25000000 --num_envs 4 --intrinsic_reward_scale=0.2' launch.sh
 done
 
 ##Continuous RL envs
@@ -29,8 +29,8 @@ strings=(
 for env in "${strings[@]}"; do
     # echo "$env"
     # sbatch --array=1-4 --export=ALL,ALG='cleanrl/ppo_continuous_action.py',ENV_ID=$env,ARGSS='--total_timesteps 10000000' launch.sh
-    sbatch --array=1-4 --export=ALL,ALG='cleanrl/ppo_continuous_action.py',ENV_ID=$env,ARGSS='--intrinsic_rewards RND --intrinsic_reward_scale=0.2 --num_envs 8 --total_timesteps 10000000' launch.sh
-    sbatch --array=1-4 --export=ALL,ALG='cleanrl/ppo_continuous_action.py',ENV_ID=$env,ARGSS='--intrinsic_rewards RND --intrinsic_reward_scale=0.5 --num_envs 8 --total_timesteps 10000000' launch.sh
+    sbatch --array=1-4 --export=ALL,ALG='cleanrl/ppo_continuous_action.py',ENV_ID=$env,ARGSS='--intrinsic_rewards RND --intrinsic_reward_scale=0.2 --num_envs 4 --total_timesteps 10000000' launch.sh
+    sbatch --array=1-4 --export=ALL,ALG='cleanrl/ppo_continuous_action.py',ENV_ID=$env,ARGSS='--intrinsic_rewards RND --intrinsic_reward_scale=0.5 --num_envs 4 --total_timesteps 10000000' launch.sh
 done
 
 ## Atari RL envs

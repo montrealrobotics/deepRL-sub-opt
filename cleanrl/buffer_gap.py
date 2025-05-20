@@ -136,7 +136,7 @@ class BufferGapV2():
         max_t = 1000 if max_t==None else max_t
         samples_ = 1
         for j in range(samples_):
-            obs, _ = self._envs.reset()
+            # obs, _ = self._envs.reset()
             returns_ = np.zeros(self._envs.num_envs, dtype=np.float32)
             for t in range(max_t):
                 
@@ -147,19 +147,18 @@ class BufferGapV2():
                 if "final_info" in infos: ## This final info logic is not very clear
                     for info in infos["final_info"]:
                         if info and "episode" in info:
-                    #         returns.extend(info['episode']['r'])
-                    #         break
-                    # break 
-                            pass
+                            returns.extend(info['episode']['r'])
+                            break
+                    break 
+                            # pass
                 else:
                     returns_ += infos['reward']
                 # Check if the episode is done
-                # if terminations.any() or truncations.any():
-                #     dones = np.logical_or(terminations, truncations)
-                #     returns.extend(np.where(dones, returns_, 0.0))
-                #     break
-                # el
-                if t == (max_t - 1): ## If the code makes it to here then no episode finished early
+                if terminations.any() or truncations.any():
+                    dones = np.logical_or(terminations, truncations)
+                    returns.extend(np.where(dones, returns_, 0.0))
+                    break
+                elif t == (max_t - 1): ## If the code makes it to here then no episode finished early
                     returns.extend(returns_)
                     break
             # print("COde shoud not get here")
