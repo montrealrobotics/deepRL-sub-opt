@@ -9,6 +9,8 @@ colors = {'Best $5\%$ - $\pi$': '#F28E2B',
           'Best $5\%$ from last 1000 episodes - $\pi$' : '#4E79A7',
           'Best $5\%$ - $\pi$ w RND': '#B6992D',
           'Best $5\%$ from last 1000 episodes - $\pi$ w RND': '#59A14F',
+          'Best $5\%$ - $\pi$ w ResNet': "#AD2DB6",
+          'Best $5\%$ from last 1000 episodes - $\pi$ w ResNet': "#A14F82",
           'Expert': '#D7B5A6',
           'Best $5\%$ from last 1000 episodes' : '#B68CB6',
           '$\pi$' : '#D4A6CD',
@@ -18,14 +20,16 @@ colors = {'Best $5\%$ - $\pi$': '#F28E2B',
          }
 linestyle = {'Best $5\%$ - $\pi$': '-',
           'Best $5\%$ from last 1000 episodes - $\pi$': '-',
-          'Best $5\%$ - $\pi$ w RND': '-',
-          'Best $5\%$ from last 1000 episodes - $\pi$ w RND': '-',
+          'Best $5\%$ - $\pi$ w RND': '--',
+          'Best $5\%$ from last 1000 episodes - $\pi$ w RND': '--',
+          'Best $5\%$ - $\pi$ w ResNet': "--",
+          'Best $5\%$ from last 1000 episodes - $\pi$ w ResNet': "--",
           'Expert': '-',
           'Best $5\%$ from last 1000 episodes': '-',
           'Best $5\%$' : '-',
           'Reward + ICM' : '-',
           '$\pi$': '-',
-          '$\pi$ deterministic': '-',
+          '$\pi$ deterministic': '--',
           'Best traj ever': '--',
          }
 def plotsns_smoothed(ax, s, df, label, title=None, ylabel=None, res=1):
@@ -175,9 +179,9 @@ if __name__ == '__main__':
     ax3.legend()
     #plt.subplots_adjust(bottom=.25, wspace=.25)
     plt.show()
-    fig.savefig(title+".svg")
-    fig.savefig(title+".png")
-    fig.savefig(title+".pdf")
+    fig.savefig("data/"+title+".svg")
+    fig.savefig("data/"+title+".png")
+    fig.savefig("data/"+title+".pdf")
 
 
     fig, (ax3) = plt.subplots(1, 1, figsize=(8,5))
@@ -240,6 +244,6 @@ if __name__ == '__main__':
     ax3.legend()
     #plt.subplots_adjust(bottom=.25, wspace=.25)
     plt.show()
-    fig.savefig(title+".svg")
-    fig.savefig(title+".png")
-    fig.savefig(title+".pdf")
+    fig.savefig("data/"+title+".svg")
+    fig.savefig("data/"+title+".png")
+    fig.savefig("data/"+title+".pdf")

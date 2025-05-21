@@ -94,9 +94,9 @@ if __name__ == '__main__':
     ax3.legend()
     #plt.subplots_adjust(bottom=.25, wspace=.25)
     plt.show()
-    fig.savefig(title+".svg")
-    fig.savefig(title+".png")
-    fig.savefig(title+".pdf")
+    fig.savefig("data/"+title+".svg")
+    fig.savefig("data/"+title+".png")
+    fig.savefig("data/"+title+".pdf")
 
 
 
@@ -108,13 +108,16 @@ if __name__ == '__main__':
     #####################
     #*******************************************************************************
     
-    datadir = './data/PPO_SpaceInvaders_with_E3B.csv'
+    datadir = './data/PPO_SpaceInvaders_with_RND.csv'
     df = pd.read_csv(datadir)
     title = 'Global Optimality Gap on Space Invaders'
     ax3.set_title(title)
 
     jobs = [
-        "SpaceInvadersNoFrameskip-v4__ppo_atari__0__1747414032",
+        "SpaceInvadersNoFrameskip-v4__ppo_atari__6833537__4__1747603416",
+        "SpaceInvadersNoFrameskip-v4__ppo_atari__6834014__3__1747603275",
+        "SpaceInvadersNoFrameskip-v4__ppo_atari__6834007__2__1747603238",
+        "SpaceInvadersNoFrameskip-v4__ppo_atari__6834006__1__1747603238",
         
     ]
 
@@ -146,6 +149,9 @@ if __name__ == '__main__':
     ax3.set_title(title)
 
     jobs = [
+        "SpaceInvadersNoFrameskip-v4__ppo_atari__3__1747414032",
+        "SpaceInvadersNoFrameskip-v4__ppo_atari__2__1747414032",
+        "SpaceInvadersNoFrameskip-v4__ppo_atari__1__1747414032",
         "SpaceInvadersNoFrameskip-v4__ppo_atari__0__1747414032",
         
     ]
@@ -179,6 +185,6 @@ if __name__ == '__main__':
     ax3.legend()
     #plt.subplots_adjust(bottom=.25, wspace=.25)
     plt.show()
-    fig.savefig(title+".svg")
-    fig.savefig(title+".png")
-    fig.savefig(title+".pdf")
+    fig.savefig("data/"+title+".svg")
+    fig.savefig("data/"+title+".png")
+    fig.savefig("data/"+title+".pdf")
