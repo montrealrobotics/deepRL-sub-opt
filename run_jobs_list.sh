@@ -2,28 +2,28 @@
 ## Code to run all the jobs for this codebase 
 
 ## Discrete RL Envs
-strings=(
-    "MinAtar/SpaceInvaders-v0"
-    # "MinAtar/Asterix-v0"
-    "MinAtar/Breakout-v0"
-    "MinAtar/Seaquest-v0"
-    # "MinAtar/Freeway-v0"
-    # "LunarLander-v2"
-)
-for env in "${strings[@]}"; do
-    # echo "$env"
-    # sbatch --array=1-4 --export=ALL,ALG='cleanrl/dqn.py',ENV_ID=$env,ARGSS='--total_timesteps 25000000 --intrinsic_reward_scale=0.2' launch.sh
-    # sbatch --array=1-4 --export=ALL,ALG='cleanrl/ppo.py',ENV_ID=$env,ARGSS='--total_timesteps 25000000 --num_envs 4 --intrinsic_reward_scale=0.2' launch.sh
+# strings=(
+#     "MinAtar/SpaceInvaders-v0"
+#     # "MinAtar/Asterix-v0"
+#     "MinAtar/Breakout-v0"
+#     "MinAtar/Seaquest-v0"
+#     # "MinAtar/Freeway-v0"
+#     # "LunarLander-v2"
+# )
+# for env in "${strings[@]}"; do
+#     # echo "$env"
+#     # sbatch --array=1-4 --export=ALL,ALG='cleanrl/dqn.py',ENV_ID=$env,ARGSS='--total_timesteps 25000000 --intrinsic_reward_scale=0.2' launch.sh
+#     # sbatch --array=1-4 --export=ALL,ALG='cleanrl/ppo.py',ENV_ID=$env,ARGSS='--total_timesteps 25000000 --num_envs 4 --intrinsic_reward_scale=0.2' launch.sh
 
-    # sbatch --array=1-4 --export=ALL,ALG='cleanrl/dqn.py',ENV_ID=$env,INTRINSIC_REWARDS='--intrinsic_rewards RND',ARGSS='--total_timesteps 25000000 --intrinsic_reward_scale=0.2' launch.sh
-    # sbatch --array=1-4 --export=ALL,ALG='cleanrl/ppo.py',ENV_ID=$env,INTRINSIC_REWARDS='--intrinsic_rewards E3B',ARGSS='--total_timesteps 25000000 --num_envs 4 --intrinsic_reward_scale=0.2' launch.sh
+#     # sbatch --array=1-4 --export=ALL,ALG='cleanrl/dqn.py',ENV_ID=$env,INTRINSIC_REWARDS='--intrinsic_rewards RND',ARGSS='--total_timesteps 25000000 --intrinsic_reward_scale=0.2' launch.sh
+#     # sbatch --array=1-4 --export=ALL,ALG='cleanrl/ppo.py',ENV_ID=$env,INTRINSIC_REWARDS='--intrinsic_rewards E3B',ARGSS='--total_timesteps 25000000 --num_envs 4 --intrinsic_reward_scale=0.2' launch.sh
 
-    sbatch --array=1-4 --export=ALL,ALG='cleanrl/dqn.py',ENV_ID=$env,ARGSS='--num_layers=16 --total_timesteps 25000000 ' launch.sh
-    sbatch --array=1-4 --export=ALL,ALG='cleanrl/ppo.py',ENV_ID=$env,ARGSS='--num_layers=16 --total_timesteps 25000000 --num_envs 4' launch.sh
+#     sbatch --array=1-4 --export=ALL,ALG='cleanrl/dqn.py',ENV_ID=$env,ARGSS='--num_layers=16 --total_timesteps 10000000 ' launch.sh
+#     sbatch --array=1-4 --export=ALL,ALG='cleanrl/ppo.py',ENV_ID=$env,ARGSS='--num_layers=16 --total_timesteps 10000000 --num_envs 4' launch.sh
 
-    sbatch --array=1-4 --export=ALL,ALG='cleanrl/dqn.py',ENV_ID=$env,ARGSS='--num_layers=16 --use_layer_norm --total_timesteps 25000000 ' launch.sh
-    sbatch --array=1-4 --export=ALL,ALG='cleanrl/ppo.py',ENV_ID=$env,ARGSS='--num_layers=16 --use_layer_norm --total_timesteps 25000000 --num_envs 4' launch.sh
-done
+#     sbatch --array=1-4 --export=ALL,ALG='cleanrl/dqn.py',ENV_ID=$env,ARGSS='--num_layers=16 --use_layer_norm --total_timesteps 10000000 ' launch.sh
+#     sbatch --array=1-4 --export=ALL,ALG='cleanrl/ppo.py',ENV_ID=$env,ARGSS='--num_layers=16 --use_layer_norm --total_timesteps 10000000 --num_envs 4' launch.sh
+# done
 
 ##Continuous RL envs
 strings=(
@@ -35,8 +35,12 @@ strings=(
 for env in "${strings[@]}"; do
     # echo "$env"
     # sbatch --array=1-4 --export=ALL,ALG='cleanrl/ppo_continuous_action.py',ENV_ID=$env,ARGSS='--total_timesteps 10000000' launch.sh
-    sbatch --array=1-4 --export=ALL,ALG='cleanrl/ppo_continuous_action.py',ENV_ID=$env,ARGSS='--num_layers=16 --num_envs 4 --total_timesteps 10000000' launch.sh
-    sbatch --array=1-4 --export=ALL,ALG='cleanrl/ppo_continuous_action.py',ENV_ID=$env,ARGSS='--num_layers=16 --use_layer_norm --num_envs 4 --total_timesteps 10000000' launch.sh
+    sbatch --array=1-5 --export=ALL,ALG='cleanrl/ppo_continuous_action.py',ENV_ID=$env,ARGSS='--num_layers=16 --num_envs 4 --total_timesteps 5000000' launch.sh
+    sbatch --array=1-5 --export=ALL,ALG='cleanrl/ppo_continuous_action.py',ENV_ID=$env,ARGSS='--num_layers=32 --num_envs 4 --total_timesteps 5000000' launch.sh
+    sbatch --array=1-5 --export=ALL,ALG='cleanrl/ppo_continuous_action.py',ENV_ID=$env,ARGSS='--num_layers=64 --num_envs 4 --total_timesteps 5000000' launch.sh
+    sbatch --array=1-5 --export=ALL,ALG='cleanrl/ppo_continuous_action.py',ENV_ID=$env,ARGSS='--num_layers=128 --num_envs 4 --total_timesteps 5000000' launch.sh
+    sbatch --array=1-5 --export=ALL,ALG='cleanrl/ppo_continuous_action.py',ENV_ID=$env,ARGSS='--num_layers=256 --num_envs 4 --total_timesteps 5000000' launch.sh
+    # sbatch --array=1-4 --export=ALL,ALG='cleanrl/ppo_continuous_action.py',ENV_ID=$env,ARGSS='--num_layers=16 --use_layer_norm --num_envs 4 --total_timesteps 5000000' launch.sh
 done
 
 ## Atari RL envs
