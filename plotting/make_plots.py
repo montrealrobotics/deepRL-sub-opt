@@ -5,16 +5,16 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns; sns.set(font_scale=1.2)
 
-colors = {'Best $5\%$ - $\pi$': 'orange',
-          'Best $5\%$ from last 1000 episodes - $\pi$' : 'blue',
-          'Best $5\%$ - $\pi$ w RND': 'brown',
-          'Best $5\%$ from last 1000 episodes - $\pi$ w RND': 'green',
-          'Expert': 'olive',
-          'Best $5\%$ from last 1000 episodes' : 'gray',
-          '$\pi$' : 'pink',
-          '$\pi$ deterministic': 'purple',
-          'Best $5\%$': 'teal',
-          'Best traj ever': 'red',
+colors = {'Best $5\%$ - $\pi$': '#F28E2B',
+          'Best $5\%$ from last 1000 episodes - $\pi$' : '#4E79A7',
+          'Best $5\%$ - $\pi$ w RND': '#B6992D',
+          'Best $5\%$ from last 1000 episodes - $\pi$ w RND': '#59A14F',
+          'Expert': '#D7B5A6',
+          'Best $5\%$ from last 1000 episodes' : '#B68CB6',
+          '$\pi$' : '#D4A6CD',
+          '$\pi$ deterministic': '#B07AA1',
+          'Best $5\%$': '#A0CBE8',
+          'Best traj ever': '#E15759',
          }
 linestyle = {'Best $5\%$ - $\pi$': '-',
           'Best $5\%$ from last 1000 episodes - $\pi$': '-',
