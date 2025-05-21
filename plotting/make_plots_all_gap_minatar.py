@@ -9,7 +9,7 @@ from make_plots import *
 
 if __name__ == '__main__':
 
-    res = 20
+    res = 50
     lw_ = 3
     fig, (ax3) = plt.subplots(1, 1, figsize=(8,5))
     #*******************************************************************************
@@ -18,34 +18,27 @@ if __name__ == '__main__':
     #####################
     #*******************************************************************************
     
-    datadir = './data/PPO_MR-all.csv'
+    datadir = './data/DQN_Minatar_Breakout_all.csv'
     df = pd.read_csv(datadir)
-    title = 'Global Optimality Gap for Montezumas Revenge'
+    title = 'Global Optimality Gap for MinAtar Breakout'
     ax3.set_title(title)
 
     jobs = [
-        "MontezumaRevengeNoFrameskip-v4__ppo_atari__0__0__1747414034",
-        "MontezumaRevengeNoFrameskip-v4__ppo_atari__0__6__1747414032",
-        "MontezumaRevengeNoFrameskip-v4__ppo_atari__0__5__1747414032",
-        "MontezumaRevengeNoFrameskip-v4__ppo_atari__0__4__1747414032",
-        "MontezumaRevengeNoFrameskip-v4__ppo_atari__0__3__1747414032",
-        "MontezumaRevengeNoFrameskip-v4__ppo_atari__0__1__1747414032",
-        "MontezumaRevengeNoFrameskip-v4__ppo_atari__0__0__1747414032"
+        "MinAtar/Breakout-v0__dqn__6848987__4__1747756857",
+        "MinAtar/Breakout-v0__dqn__6849039__1__1747756857",
+        "MinAtar/Breakout-v0__dqn__6849040__2__1747756857",
+        "MinAtar/Breakout-v0__dqn__6849041__3__1747756857",
     ]
 
     #####################
     ##### w/ Optimal ######
 
-    # steps_ = deNan(df["MontezumaRevengeNoFrameskip-v4__ppo_atari__0__1__1747414032 - global_step"].to_numpy())
+    plot_data = get_data_frame(df, key=" - charts/replay_best_returns", res=res, jobs=jobs)
 
-    # steps_ = np.array([np.mean(steps_[i:i+res]) for i in range(0, len(steps_)-res+1, res)])
-    # plot_data = pd.DataFrame([(step_, 50) for step_ in steps_])
-
-    # label='Expert'
-    # plot_data = plot_data.rename(columns={0: 'Steps', 1: label})
-    # sns.lineplot(data=plot_data, x='Steps', y=label, ax=ax3, label=label, c=colors[label])
-    # ax3.lines[-1].set_linestyle(linestyle[label])
-
+    label='Best traj'
+    plot_data = plot_data.rename(columns={0: 'Steps', 1: label})
+    sns.lineplot(data=plot_data, x='Steps', y=label, ax=ax3, label=label, c=colors[label], linewidth=lw_)
+    ax3.lines[-1].set_linestyle(linestyle[label])
     
     #####################
     ##### w/ \pi ######
@@ -53,7 +46,7 @@ if __name__ == '__main__':
     
     plot_data = get_data_frame(df, key=" - charts/global_optimality_gap", res=res, jobs=jobs)
 
-    label='Best $5\%$ - $\pi$'
+    label='Global Gap'
     plot_data = plot_data.rename(columns={0: 'Steps', 1: label})
     sns.lineplot(data=plot_data, x='Steps', y=label, ax=ax3, label=label, c=colors[label], linewidth=lw_)
     ax3.lines[-1].set_linestyle(linestyle[label])
@@ -103,24 +96,22 @@ if __name__ == '__main__':
     #####################
     ##### w/ Optimal ######
 
-    # steps_ = deNan(df["MontezumaRevengeNoFrameskip-v4__ppo_atari__0__1__1747414032 - global_step"].to_numpy())
+    plot_data = get_data_frame(df, key=" - charts/global_optimality_gap", res=res, jobs=jobs)
 
-    # steps_ = np.array([np.mean(steps_[i:i+res]) for i in range(0, len(steps_)-res+1, res)])
-    # plot_data = pd.DataFrame([(step_, 50) for step_ in steps_])
+    label='Global Gap'
+    plot_data = plot_data.rename(columns={0: 'Steps', 1: label})
+    sns.lineplot(data=plot_data, x='Steps', y=label, ax=ax3, label=label, c=colors[label], linewidth=lw_)
+    ax3.lines[-1].set_linestyle(linestyle[label])
 
-    # label='Expert'
-    # plot_data = plot_data.rename(columns={0: 'Steps', 1: label})
-    # sns.lineplot(data=plot_data, x='Steps', y=label, ax=ax3, label=label, c=colors[label])
-    # ax3.lines[-1].set_linestyle(linestyle[label])
 
     
         #####################
     ##### w/ \pi ######
     #####################
     
-    plot_data = get_data_frame(df, key=" - charts/global_optimality_gap", res=res, jobs=jobs)
+    plot_data = get_data_frame(df, key=" - charts/replay_best_returns", res=res, jobs=jobs)
 
-    label='Best $5\%$ - $\pi$'
+    label='Best traj'
     plot_data = plot_data.rename(columns={0: 'Steps', 1: label})
     sns.lineplot(data=plot_data, x='Steps', y=label, ax=ax3, label=label, c=colors[label], linewidth=lw_)
     ax3.lines[-1].set_linestyle(linestyle[label])

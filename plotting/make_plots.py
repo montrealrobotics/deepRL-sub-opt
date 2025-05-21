@@ -5,25 +5,28 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns; sns.set(font_scale=1.2)
 
-colors = {'Global Gap': 'orange',
-          'Local Gap' : 'b',
-          'ICM': 'b',
-          'RND': 'orange',
-          'Expert': 'g',
-          'Recent top data' : 'k',
-          '$\pi$' : 'b',
-          '\pi deterministic': 'purple',
-          'Best top data': 'brown',
+colors = {'Best $5\%$ - $\pi$': 'orange',
+          'Best $5\%$ from last 1000 episodes - $\pi$' : 'blue',
+          'Best $5\%$ - $\pi$ w RND': 'brown',
+          'Best $5\%$ from last 1000 episodes - $\pi$ w RND': 'green',
+          'Expert': 'olive',
+          'Best $5\%$ from last 1000 episodes' : 'gray',
+          '$\pi$' : 'pink',
+          '$\pi$ deterministic': 'purple',
+          'Best $5\%$': 'teal',
+          'Best traj ever': 'red',
          }
-linestyle = {'Global Gap': '-',
-          'Local Gap': '-',
-          'RND': '-',
+linestyle = {'Best $5\%$ - $\pi$': '-',
+          'Best $5\%$ from last 1000 episodes - $\pi$': '-',
+          'Best $5\%$ - $\pi$ w RND': '-',
+          'Best $5\%$ from last 1000 episodes - $\pi$ w RND': '-',
           'Expert': '-',
-          'Recent top data': '-',
-          'Best top data' : '-',
+          'Best $5\%$ from last 1000 episodes': '-',
+          'Best $5\%$' : '-',
           'Reward + ICM' : '-',
           '$\pi$': '-',
-          '\pi deterministic': '-',
+          '$\pi$ deterministic': '-',
+          'Best traj ever': '--',
          }
 def plotsns_smoothed(ax, s, df, label, title=None, ylabel=None, res=1):
     data = list(df[s])
@@ -82,16 +85,16 @@ def deNan(data_):
             data_[i] = data_[i-1]
     return data_
 
-def get_data_frame(df, key, res=10, jobs=None):
+def get_data_frame(df, key, res=10, jobs=None, max=10000000000):
     
 
     plot_data = []
     for i in range(len(jobs)): 
         key__ =   jobs[i]+" - global_step"
         # steps_ = deNan(df[key__].to_numpy())
-        steps_ = range(len(df[key__]))
+        steps_ = range(min(len(df[key__]), max))
         steps_ = np.array([np.mean(steps_[i:i+res]) for i in range(0, len(steps_)-res+1, res)])
-        data_ = df[jobs[i]+key].to_numpy()
+        data_ = df[jobs[i]+key][:max].to_numpy()
         data_ = deNan(data_)
         print(jobs[i]+key, data_)
         # data_ = (np.cumsum(data_)[res:] - np.cumsum(data_)[:-res])/res
