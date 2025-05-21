@@ -94,6 +94,12 @@ class Args:
     """The job id for the slurm job"""
     intrinsic_reward_scale: float = 1.0
     """The scale of the intrinsic reward"""
+    num_layers: int = 1
+    """The number of layers in the neural network"""
+    num_units: int = 128
+    """The number of units in the neural network"""
+    use_layer_norm: bool = True
+    """Whether to use layer normalization"""
 
 
 def make_env(env_id, idx, capture_video, run_name):
@@ -119,22 +125,38 @@ def layer_init(layer, std=np.sqrt(2), bias_const=0.0):
 class Agent(nn.Module):
     def __init__(self, envs):
         super().__init__()
-        self.critic = nn.Sequential(
+
+        layers = [
+                    nn.Flatten(),
+                  layer_init(nn.Linear(np.array(envs.single_observation_space.shape).prod(), args.num_units)),
+                  nn.Tanh()]
+        for i in range(args.num_layers-1):
+            layers.append(layer_init(nn.Linear(args.num_units, args.num_units)))
+            layers.append(nn.Tanh())
+            if args.use_layer_norm:
+                layers.append(nn.LayerNorm(args.num_units))
+
+        layers.extend([layer_init(nn.Linear(args.num_units, 64)),
+            nn.Tanh(),
+            layer_init(nn.Linear(64, 1), std=1.0)])
+        self.critic = nn.Sequential(*layers)
+
+        layers = [
             nn.Flatten(),
-            layer_init(nn.Linear(np.array(envs.single_observation_space.shape).prod(), 128)),
+                  layer_init(nn.Linear(np.array(envs.single_observation_space.shape).prod(), args.num_units)),
+                  nn.Tanh()]
+        for i in range(args.num_layers-1):
+            layers.append(layer_init(nn.Linear(args.num_units, args.num_units)))
+            layers.append(nn.Tanh())
+            if args.use_layer_norm:
+                layers.append(nn.LayerNorm(args.num_units))
+
+        layers.extend([
+                layer_init(nn.Linear(args.num_units, 64)),
             nn.Tanh(),
-            layer_init(nn.Linear(128, 64)),
-            nn.Tanh(),
-            layer_init(nn.Linear(64, 1), std=1.0),
-        )
-        self.actor = nn.Sequential(
-            nn.Flatten(),
-            layer_init(nn.Linear(np.array(envs.single_observation_space.shape).prod(), 128)),
-            nn.Tanh(),
-            layer_init(nn.Linear(128, 64)),
-            nn.Tanh(),
-            layer_init(nn.Linear(64, envs.single_action_space.n), std=0.01),
-        )
+            layer_init(nn.Linear(64, envs.single_action_space.n), std=0.01)])
+
+        self.actor = nn.Sequential(*layers)
 
     def get_value(self, x):
         return self.critic(x)

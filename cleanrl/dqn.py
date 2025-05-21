@@ -87,6 +87,12 @@ class Args:
     """The job id for the slurm job"""
     intrinsic_reward_scale: float = 1.0
     """The scale of the intrinsic reward"""
+    num_layers: int = 1
+    """The number of layers in the neural network"""
+    num_units: int = 120
+    """The number of units in the neural network"""
+    use_layer_norm: bool = False
+    """Whether to use layer normalization"""
 
 
 def make_env(env_id, seed, idx, capture_video, run_name):
@@ -109,14 +115,21 @@ def make_env(env_id, seed, idx, capture_video, run_name):
 class QNetwork(nn.Module):
     def __init__(self, env):
         super().__init__()
-        self.network = nn.Sequential(
-            nn.Flatten(),
-            nn.Linear(np.array(env.single_observation_space.shape).prod(), 120),
-            nn.ReLU(),
-            nn.Linear(120, 84),
-            nn.ReLU(),
-            nn.Linear(84, env.single_action_space.n),
-        )
+
+        layers = [
+                nn.Flatten(),
+                  nn.Linear(np.array(envs.single_observation_space.shape).prod(), args.num_units),
+                  nn.ReLU()]
+        for i in range(args.num_layers-1):
+            layers.append(nn.Linear(args.num_units, args.num_units))
+            layers.append(nn.ReLU())
+            if args.use_layer_norm:
+                layers.append(nn.LayerNorm(args.num_units))
+
+        layers.extend([nn.Linear(args.num_units, 84),
+                        nn.ReLU(),
+                        nn.Linear(84, env.single_action_space.n),])
+        self.network = nn.Sequential(*layers)
 
     def forward(self, x):
         return self.network(x)

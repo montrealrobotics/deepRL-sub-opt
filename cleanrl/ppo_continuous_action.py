@@ -13,6 +13,7 @@ import tyro
 from torch.distributions.normal import Normal
 from torch.utils.tensorboard import SummaryWriter
 import heapq
+from collections import OrderedDict
 
 
 @dataclass
@@ -95,6 +96,12 @@ class Args:
     """The job id for the slurm job"""
     intrinsic_reward_scale: float = 1.0
     """The scale of the intrinsic reward"""
+    num_layers: int = 1
+    """The number of layers in the neural network"""
+    num_units: int = 64
+    """The number of units in the neural network"""
+    use_layer_norm: bool = False
+    """Whether to use layer normalization"""
 
 
 
@@ -127,20 +134,30 @@ def layer_init(layer, std=np.sqrt(2), bias_const=0.0):
 class Agent(nn.Module):
     def __init__(self, envs):
         super().__init__()
-        self.critic = nn.Sequential(
-            layer_init(nn.Linear(np.array(envs.single_observation_space.shape).prod(), 64)),
-            nn.Tanh(),
-            layer_init(nn.Linear(64, 64)),
-            nn.Tanh(),
-            layer_init(nn.Linear(64, 1), std=1.0),
-        )
-        self.actor_mean = nn.Sequential(
-            layer_init(nn.Linear(np.array(envs.single_observation_space.shape).prod(), 64)),
-            nn.Tanh(),
-            layer_init(nn.Linear(64, 64)),
-            nn.Tanh(),
-            layer_init(nn.Linear(64, np.prod(envs.single_action_space.shape)), std=0.01),
-        )
+        layers = [
+                  layer_init(nn.Linear(np.array(envs.single_observation_space.shape).prod(), args.num_units)),
+                  nn.Tanh()]
+        for i in range(args.num_layers):
+            layers.append(layer_init(nn.Linear(args.num_units, args.num_units)))
+            layers.append(nn.Tanh())
+            if args.use_layer_norm:
+                layers.append(nn.LayerNorm(args.num_units))
+
+        layers.append(layer_init(nn.Linear(args.num_units, 1), std=1.0))
+        self.critic = nn.Sequential(*layers)
+
+        layers = [
+                  layer_init(nn.Linear(np.array(envs.single_observation_space.shape).prod(), args.num_units)),
+                  nn.Tanh()]
+        for i in range(args.num_layers):
+            layers.append(layer_init(nn.Linear(args.num_units, args.num_units)))
+            layers.append(nn.Tanh())
+            if args.use_layer_norm:
+                layers.append(nn.LayerNorm(args.num_units))
+
+        layers.append(layer_init(nn.Linear(args.num_units, np.prod(envs.single_action_space.shape)), std=0.01))
+
+        self.actor_mean = nn.Sequential(*layers)
         self.actor_logstd = nn.Parameter(torch.zeros(1, np.prod(envs.single_action_space.shape)))
 
     def get_value(self, x):
