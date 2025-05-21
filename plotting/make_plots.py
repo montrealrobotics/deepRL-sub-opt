@@ -5,16 +5,16 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns; sns.set(font_scale=1.2)
 
-colors = {'Best $5\%$ - $\pi$': '#F28E2B',
-          'Best $5\%$ from last 1000 episodes - $\pi$' : '#4E79A7',
+colors = {'Best $5\%$ - $\pi$': '#bf5b17',
+          'Best $5\%$ from last 1000 episodes - $\pi$' : '#386cb0',
           'Best $5\%$ - $\pi$ w RND': '#B6992D',
-          'Best $5\%$ from last 1000 episodes - $\pi$ w RND': '#59A14F',
-          'Best $5\%$ - $\pi$ w ResNet': "#AD2DB6",
-          'Best $5\%$ from last 1000 episodes - $\pi$ w ResNet': "#A14F82",
+          'Best $5\%$ from last 1000 episodes - $\pi$ w RND': '#7fc97f',
+          'Best $5\%$ - $\pi$ w ResNet': "#beaed4",
+          'Best $5\%$ from last 1000 episodes - $\pi$ w ResNet': "#ffff99",
           'Expert': '#D7B5A6',
-          'Best $5\%$ from last 1000 episodes' : '#B68CB6',
-          '$\pi$' : '#D4A6CD',
-          '$\pi$ deterministic': '#B07AA1',
+          'Best $5\%$ from last 1000 episodes' : "#C36FC3",
+          '$\pi$' : '#666666',
+          '$\pi$ deterministic': '#f0027f',
           'Best $5\%$': '#A0CBE8',
           'Best traj ever': '#E15759',
          }
@@ -95,8 +95,10 @@ def get_data_frame(df, key, res=10, jobs=None, max=10000000000):
     plot_data = []
     for i in range(len(jobs)): 
         key__ =   jobs[i]+" - global_step"
-        # steps_ = deNan(df[key__].to_numpy())
-        steps_ = range(min(len(df[key__]), max))
+        len_ = min(len(df[key__]), max)
+        steps_ = range(len_)
+        steps_t = deNan(df[key__].to_numpy())[:len_]
+        scale_ = steps_t[-1] / steps_[-1]
         steps_ = np.array([np.mean(steps_[i:i+res]) for i in range(0, len(steps_)-res+1, res)])
         data_ = df[jobs[i]+key][:max].to_numpy()
         data_ = deNan(data_)
@@ -110,6 +112,9 @@ def get_data_frame(df, key, res=10, jobs=None, max=10000000000):
 
         # plot_data.extend([(step_, val, std_) for step_, val, std_ in zip(steps_, data_, stds_)])
         plot_data.extend([(step_, val) for step_, val in zip(steps_, data_)])
+    
+    ## Scale the steps based on the true data.
+    plot_data = [(int(step_*scale_), val) for step_, val in plot_data]
     
     plot_data = pd.DataFrame(plot_data)
     

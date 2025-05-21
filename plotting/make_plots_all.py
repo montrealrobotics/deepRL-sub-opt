@@ -9,7 +9,7 @@ from make_plots import *
         
 if __name__ == '__main__':
 
-    res = 50
+    res = 100
     lw_ = 3
     fig, (ax3) = plt.subplots(1, 1, figsize=(8,5))
     #*******************************************************************************
@@ -82,7 +82,7 @@ if __name__ == '__main__':
     
     ax3.ticklabel_format(axis= 'x', style='sci', scilimits=(0,3))
     ax3.set(ylabel='Return')
-    ax3.set(xlabel='Steps x $10^5$')
+    ax3.set(xlabel='Steps x $10^6$')
     ax3.legend()
     #plt.subplots_adjust(bottom=.25, wspace=.25)
     plt.show()

@@ -72,7 +72,7 @@ if __name__ == '__main__':
     
     ax3.ticklabel_format(axis= 'x', style='sci', scilimits=(0,3))
     ax3.set(ylabel='Return')
-    ax3.set(xlabel='Steps x $10^4$')
+    ax3.set(xlabel='Steps')
     ax3.legend()
     #plt.subplots_adjust(bottom=.25, wspace=.25)
     plt.show()
@@ -140,7 +140,7 @@ if __name__ == '__main__':
     
     ax3.ticklabel_format(axis= 'x', style='sci', scilimits=(0,3))
     ax3.set(ylabel='Return')
-    ax3.set(xlabel='Steps x $10^4$')
+    ax3.set(xlabel='Steps')
     ax3.legend()
     #plt.subplots_adjust(bottom=.25, wspace=.25)
     plt.show()
