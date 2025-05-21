@@ -4,11 +4,11 @@
 ## Discrete RL Envs
 strings=(
     "MinAtar/SpaceInvaders-v0"
-    "MinAtar/Asterix-v0"
+    # "MinAtar/Asterix-v0"
     "MinAtar/Breakout-v0"
     "MinAtar/Seaquest-v0"
-    "MinAtar/Freeway-v0"
-    "LunarLander-v2"
+    # "MinAtar/Freeway-v0"
+    # "LunarLander-v2"
 )
 for env in "${strings[@]}"; do
     # echo "$env"
@@ -18,25 +18,25 @@ for env in "${strings[@]}"; do
     # sbatch --array=1-4 --export=ALL,ALG='cleanrl/dqn.py',ENV_ID=$env,INTRINSIC_REWARDS='--intrinsic_rewards RND',ARGSS='--total_timesteps 25000000 --intrinsic_reward_scale=0.2' launch.sh
     # sbatch --array=1-4 --export=ALL,ALG='cleanrl/ppo.py',ENV_ID=$env,INTRINSIC_REWARDS='--intrinsic_rewards E3B',ARGSS='--total_timesteps 25000000 --num_envs 4 --intrinsic_reward_scale=0.2' launch.sh
 
-    sbatch --array=1-4 --export=ALL,ALG='cleanrl/dqn.py',ENV_ID=$env,ARGSS='--num_layers=4 --total_timesteps 25000000 ' launch.sh
-    sbatch --array=1-4 --export=ALL,ALG='cleanrl/ppo.py',ENV_ID=$env,ARGSS='--num_layers=4 --total_timesteps 25000000 --num_envs 4' launch.sh
+    sbatch --array=1-4 --export=ALL,ALG='cleanrl/dqn.py',ENV_ID=$env,ARGSS='--num_layers=16 --total_timesteps 25000000 ' launch.sh
+    sbatch --array=1-4 --export=ALL,ALG='cleanrl/ppo.py',ENV_ID=$env,ARGSS='--num_layers=16 --total_timesteps 25000000 --num_envs 4' launch.sh
 
-    sbatch --array=1-4 --export=ALL,ALG='cleanrl/dqn.py',ENV_ID=$env,ARGSS='--num_layers=4 --use_layer_norm --total_timesteps 25000000 ' launch.sh
-    sbatch --array=1-4 --export=ALL,ALG='cleanrl/ppo.py',ENV_ID=$env,ARGSS='--num_layers=4 --use_layer_norm --total_timesteps 25000000 --num_envs 4' launch.sh
+    sbatch --array=1-4 --export=ALL,ALG='cleanrl/dqn.py',ENV_ID=$env,ARGSS='--num_layers=16 --use_layer_norm --total_timesteps 25000000 ' launch.sh
+    sbatch --array=1-4 --export=ALL,ALG='cleanrl/ppo.py',ENV_ID=$env,ARGSS='--num_layers=16 --use_layer_norm --total_timesteps 25000000 --num_envs 4' launch.sh
 done
 
 ##Continuous RL envs
 strings=(
-    "Walker2d-v4"
-    "HalfCheetah-v4"
+    # "Walker2d-v4"
+    # "HalfCheetah-v4"
     "Humanoid-v4"
-    "BipedalWalker-v3"
+    # "BipedalWalker-v3"
 )
 for env in "${strings[@]}"; do
     # echo "$env"
     # sbatch --array=1-4 --export=ALL,ALG='cleanrl/ppo_continuous_action.py',ENV_ID=$env,ARGSS='--total_timesteps 10000000' launch.sh
-    sbatch --array=1-4 --export=ALL,ALG='cleanrl/ppo_continuous_action.py',ENV_ID=$env,ARGSS='--num_layers=4 --num_envs 4 --total_timesteps 10000000' launch.sh
-    sbatch --array=1-4 --export=ALL,ALG='cleanrl/ppo_continuous_action.py',ENV_ID=$env,ARGSS='--num_layers=4 --use_layer_norm --num_envs 4 --total_timesteps 10000000' launch.sh
+    sbatch --array=1-4 --export=ALL,ALG='cleanrl/ppo_continuous_action.py',ENV_ID=$env,ARGSS='--num_layers=16 --num_envs 4 --total_timesteps 10000000' launch.sh
+    sbatch --array=1-4 --export=ALL,ALG='cleanrl/ppo_continuous_action.py',ENV_ID=$env,ARGSS='--num_layers=16 --use_layer_norm --num_envs 4 --total_timesteps 10000000' launch.sh
 done
 
 ## Atari RL envs

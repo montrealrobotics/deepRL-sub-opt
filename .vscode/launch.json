@@ -9,7 +9,11 @@
             "type": "debugpy",
             "request": "launch",
             "program": "${file}",
-            "args": ["--intrinsic_rewards=RND", "--log_dir=runs2/glen.berseth/", "--job_id=14"]
+            "args": [
+                // "--intrinsic_rewards=RND", 
+                "--log_dir=runs2/glen.berseth/", 
+                "--job_id=14"
+            ]
         }
     ]
 }

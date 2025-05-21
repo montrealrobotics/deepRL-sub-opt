@@ -96,7 +96,7 @@ class Args:
     """The job id for the slurm job"""
     intrinsic_reward_scale: float = 1.0
     """The scale of the intrinsic reward"""
-    num_layers: int = 1
+    num_layers: int = 16
     """The number of layers in the neural network"""
     num_units: int = 64
     """The number of units in the neural network"""
