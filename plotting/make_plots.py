@@ -5,32 +5,32 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns; sns.set(font_scale=1.2)
 
-colors = {'Best $5\%$ - $\pi$': '#bf5b17',
-          'Best $5\%$ from last 1000 episodes - $\pi$' : '#386cb0',
-          'Best $5\%$ - $\pi$ w RND': '#B6992D',
-          'Best $5\%$ from last 1000 episodes - $\pi$ w RND': '#7fc97f',
-          'Best $5\%$ - $\pi$ w ResNet': "#beaed4",
-          'Best $5\%$ from last 1000 episodes - $\pi$ w ResNet': "#ffff99",
+colors = {'$V^{ \hat{\pi}^{*}_{ D_{\infty} } }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$': '#bf5b17',
+          '$V^{ \hat{\pi}^{*}_{D} }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$' : '#386cb0',
+          '$V^{ \hat{\pi}^{*}_{ D_{\infty} } }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$ w RND': '#B6992D',
+          '$V^{ \hat{\pi}^{*}_{D} }(s_0)$ - V^{ \hat{\pi}^{\\theta} }(s_0)$ w RND': '#7fc97f',
+          '$V^{ \hat{\pi}^{*}_{ D_{\infty} } }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$ w ResNet': "#beaed4",
+          '$V^{ \hat{\pi}^{*}_{D} }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$ w ResNet': "#ffff99",
           'Expert': '#D7B5A6',
-          'Best $5\%$ from last 1000 episodes' : "#C36FC3",
-          '$\pi$' : '#666666',
-          '$\pi$ deterministic': '#f0027f',
-          'Best $5\%$': '#A0CBE8',
-          'Best traj ever': '#E15759',
+          '$V^{ \hat{\pi}^{*} }(s_0)$' : "#C36FC3",
+          '$V^{ \hat{\pi}^{\theta} }(s_0)$' : '#666666',
+          '$V^{ \hat{\pi}^{\theta} }(s_0)$ deterministic': '#f0027f',
+          '$V^{ \hat{\pi}^{*}_{ D_{\infty} } }(s_0)$': '#A0CBE8',
+          '$V^{ \hat{\pi}^{*} }(s_0)$': '#E15759',
          }
-linestyle = {'Best $5\%$ - $\pi$': '-',
-          'Best $5\%$ from last 1000 episodes - $\pi$': '-',
-          'Best $5\%$ - $\pi$ w RND': '--',
-          'Best $5\%$ from last 1000 episodes - $\pi$ w RND': '--',
-          'Best $5\%$ - $\pi$ w ResNet': "--",
-          'Best $5\%$ from last 1000 episodes - $\pi$ w ResNet': "--",
+linestyle = {'$V^{ \hat{\pi}^{*}_{ D_{\infty} } }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$': '-',
+          '$V^{ \hat{\pi}^{*}_{D} }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$': '-',
+          '$V^{ \hat{\pi}^{*}_{ D_{\infty} } }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$ w RND': '--',
+          '$V^{ \hat{\pi}^{*}_{D} }(s_0)$ - V^{ \hat{\pi}^{\\theta} }(s_0)$ w RND': '--',
+          '$V^{ \hat{\pi}^{*}_{ D_{\infty} } }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$ w ResNet': "--",
+          '$V^{ \hat{\pi}^{*}_{D} }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$ w ResNet': "--",
           'Expert': '-',
-          'Best $5\%$ from last 1000 episodes': '-',
-          'Best $5\%$' : '-',
+          '$V^{ \hat{\pi}^{*} }(s_0)$': '-',
+          '$V^{ \hat{\pi}^{*}_{ D_{\infty} } }(s_0)$' : '-',
           'Reward + ICM' : '-',
-          '$\pi$': '-',
-          '$\pi$ deterministic': '--',
-          'Best traj ever': '--',
+          '$V^{ \hat{\pi}^{\theta} }(s_0)$': '-',
+          '$V^{ \hat{\pi}^{\theta} }(s_0)$ deterministic': '--',
+          '$V^{ \hat{\pi}^{*} }(s_0)$': '--',
          }
 def plotsns_smoothed(ax, s, df, label, title=None, ylabel=None, res=1):
     data = list(df[s])
@@ -119,6 +119,17 @@ def get_data_frame(df, key, res=10, jobs=None, max=10000000000):
     plot_data = pd.DataFrame(plot_data)
     
     return plot_data
+
+## This function will process the data from a csv file, checking the colum keys and return the strings for those keys
+def get_jobs(df):
+    keys = []
+    for i in range(len(df.columns)):
+        key = df.columns[i]
+        if ' - charts/global_optimality_gap' in key and "__MIN" not in key and "__MAX" not in key:
+            #remove the end of the key
+            key_ = key.split(' - charts/global_optimality_gap')[0]
+            keys.append(key_)
+    return keys
         
 if __name__ == '__main__':
 
