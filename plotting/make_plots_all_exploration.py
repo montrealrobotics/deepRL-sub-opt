@@ -11,7 +11,7 @@ if __name__ == '__main__':
 
     res = 50
     lw_ = 3
-    max_ = 25000
+    max_ = 25000000
     fig, (ax3) = plt.subplots(1, 1, figsize=(8,5))
     #*******************************************************************************
     #####################
@@ -54,15 +54,21 @@ if __name__ == '__main__':
     sns.lineplot(data=plot_data, x='Steps', y=label, ax=ax3, label=label, c=colors[label], linewidth=lw_)
     ax3.lines[-1].set_linestyle(linestyle[label])
 
-    datadir = './data/PPO_MR_all2_without_RND.csv'
+    # datadir = './data/PPO_MR_all2_without_RND.csv'
+    datadir = './data/PPO_MR_All.csv'
     df = pd.read_csv(datadir)
     ax3.set_title(title)
 
     jobs = [
-        "MontezumaRevengeNoFrameskip-v4__ppo_atari__6833417__2__1747595815",
-        "MontezumaRevengeNoFrameskip-v4__ppo_atari__6833418__3__1747595815",
-        "MontezumaRevengeNoFrameskip-v4__ppo_atari__6833416__1__1747595815",
-        "MontezumaRevengeNoFrameskip-v4__ppo_atari__6833409__4__1747595815",
+        # "MontezumaRevengeNoFrameskip-v4__ppo_atari__6833417__2__1747595815",
+        # "MontezumaRevengeNoFrameskip-v4__ppo_atari__6833418__3__1747595815",
+        # "MontezumaRevengeNoFrameskip-v4__ppo_atari__6833416__1__1747595815",
+        # "MontezumaRevengeNoFrameskip-v4__ppo_atari__6833409__4__1747595815",
+        "MontezumaRevengeNoFrameskip-v4__ppo_atari__6851535__1__1747793950",
+        "MontezumaRevengeNoFrameskip-v4__ppo_atari__6851536__2__1747793950",
+        "MontezumaRevengeNoFrameskip-v4__ppo_atari__6851530__4__1747793950",
+        "MontezumaRevengeNoFrameskip-v4__ppo_atari__6851537__3__1747793950",
+
     ]
 
     #####################
@@ -92,6 +98,7 @@ if __name__ == '__main__':
     ax3.set(ylabel='Return')
     ax3.set(xlabel='Steps')
     ax3.legend()
+    fig.tight_layout(pad=0.5)
     #plt.subplots_adjust(bottom=.25, wspace=.25)
     plt.show()
     fig.savefig("data/"+title+".svg")
@@ -183,6 +190,7 @@ if __name__ == '__main__':
     ax3.set(ylabel='Return')
     ax3.set(xlabel='Steps')
     ax3.legend()
+    fig.tight_layout(pad=0.5)
     #plt.subplots_adjust(bottom=.25, wspace=.25)
     plt.show()
     fig.savefig("data/"+title+".svg")
