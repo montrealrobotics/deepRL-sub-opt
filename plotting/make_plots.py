@@ -125,7 +125,7 @@ def get_jobs(df):
     keys = []
     for i in range(len(df.columns)):
         key = df.columns[i]
-        if ' - charts/global_optimality_gap' in key and "__MIN" not in key and "__MAX" not in key:
+        if ' - charts/global_optimality_gap' in key and "__MIN" not in key and "__MAX" not in key and (len(df[key]) > 10):
             #remove the end of the key
             key_ = key.split(' - charts/global_optimality_gap')[0]
             keys.append(key_)
