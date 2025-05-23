@@ -11,11 +11,11 @@ colors = {'$V^{ \hat{\pi}^{*}_{ D_{\infty} } }(s_0) - V^{ \hat{\pi}^{\\theta} }(
           '$V^{ \hat{\pi}^{*}_{D} }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$ w RND': '#7fc97f',
           '$V^{ \hat{\pi}^{*}_{ D_{\infty} } }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$ w ResNet': "#beaed4",
           '$V^{ \hat{\pi}^{*}_{D} }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$ w ResNet': "#ffff99",
-          'Expert': '#D7B5A6',
-          '$V^{ \hat{\pi}^{*} }(s_0)$' : "#C36FC3",
+          
           '$V^{ \hat{\pi}^{\\theta} }(s_0)$' : '#666666',
           '$V^{ \hat{\pi}^{\\theta} }(s_0)$ deterministic': '#f0027f',
           '$V^{ \hat{\pi}^{*}_{ D_{\infty} } }(s_0)$': '#A0CBE8',
+          '$V^{ \hat{\pi}^{*}_{D} }(s_0)$' : "#C36FC3",
           '$V^{ \hat{\pi}^{*} }(s_0)$': '#E15759',
          }
 linestyle = {'$V^{ \hat{\pi}^{*}_{ D_{\infty} } }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$': '-',
@@ -24,12 +24,11 @@ linestyle = {'$V^{ \hat{\pi}^{*}_{ D_{\infty} } }(s_0) - V^{ \hat{\pi}^{\\theta}
           '$V^{ \hat{\pi}^{*}_{D} }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$ w RND': '--',
           '$V^{ \hat{\pi}^{*}_{ D_{\infty} } }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$ w ResNet': "--",
           '$V^{ \hat{\pi}^{*}_{D} }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$ w ResNet': "--",
-          'Expert': '-',
-          '$V^{ \hat{\pi}^{*} }(s_0)$': '-',
-          '$V^{ \hat{\pi}^{*}_{ D_{\infty} } }(s_0)$' : '-',
-          'Reward + ICM' : '-',
+
           '$V^{ \hat{\pi}^{\\theta} }(s_0)$': '-',
           '$V^{ \hat{\pi}^{\\theta} }(s_0)$ deterministic': '--',
+          '$V^{ \hat{\pi}^{*}_{ D_{\infty} } }(s_0)$' : '-',
+          '$V^{ \hat{\pi}^{*}_{D} }(s_0)$': '-',
           '$V^{ \hat{\pi}^{*} }(s_0)$': '--',
          }
 def plotsns_smoothed(ax, s, df, label, title=None, ylabel=None, res=1):
