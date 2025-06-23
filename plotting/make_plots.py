@@ -11,6 +11,13 @@ colors = {'$V^{ \hat{\pi}^{*}_{ D_{\infty} } }(s_0) - V^{ \hat{\pi}^{\\theta} }(
           '$V^{ \hat{\pi}^{*}_{D} }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$ w RND': '#7fc97f',
           '$V^{ \hat{\pi}^{*}_{ D_{\infty} } }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$ w ResNet': "#beaed4",
           '$V^{ \hat{\pi}^{*}_{D} }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$ w ResNet': "#ffff99",
+
+          '$V^{ \hat{\pi}^{\\theta} }(s_0)$ w RND': '#666666',
+          '$V^{ \hat{\pi}^{*}_{ D_{\infty} } }(s_0)$ w RND': '#B6992D',
+          '$V^{ \hat{\pi}^{*}_{D} }(s_0)$ w RND': '#7fc97f',
+          '$V^{ \hat{\pi}^{\\theta} }(s_0)$ w ResNet': "#666666",
+          '$V^{ \hat{\pi}^{*}_{ D_{\infty} } }(s_0)$ w ResNet': "#beaed4",
+          '$V^{ \hat{\pi}^{*}_{D} }(s_0)$ w ResNet': "#ffff99",
           
           '$V^{ \hat{\pi}^{\\theta} }(s_0)$' : '#666666',
           '$V^{ \hat{\pi}^{\\theta} }(s_0)$ deterministic': '#f0027f',
@@ -24,6 +31,13 @@ linestyle = {'$V^{ \hat{\pi}^{*}_{ D_{\infty} } }(s_0) - V^{ \hat{\pi}^{\\theta}
           '$V^{ \hat{\pi}^{*}_{D} }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$ w RND': '--',
           '$V^{ \hat{\pi}^{*}_{ D_{\infty} } }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$ w ResNet': "--",
           '$V^{ \hat{\pi}^{*}_{D} }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$ w ResNet': "--",
+
+          '$V^{ \hat{\pi}^{\\theta} }(s_0)$ w RND': '--',
+          '$V^{ \hat{\pi}^{*}_{ D_{\infty} } }(s_0)$ w RND': '--',
+          '$V^{ \hat{\pi}^{*}_{D} }(s_0)$ w RND': '--',
+          '$V^{ \hat{\pi}^{\\theta} }(s_0)$ w ResNet': '--',
+          '$V^{ \hat{\pi}^{*}_{ D_{\infty} } }(s_0)$ w ResNet': '--',
+          '$V^{ \hat{\pi}^{*}_{D} }(s_0)$ w ResNet': '--',
 
           '$V^{ \hat{\pi}^{\\theta} }(s_0)$': '-',
           '$V^{ \hat{\pi}^{\\theta} }(s_0)$ deterministic': '--',
