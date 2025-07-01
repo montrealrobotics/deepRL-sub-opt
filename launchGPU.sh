@@ -10,7 +10,7 @@
 #SBATCH -o /network/scratch/g/glen.berseth/slurm-%j.out  # Write the log on scratch
 #SBATCH --no-requeue                                 # Do not requeue the job if it fails
 
-module load cudatoolkit/12.1 miniconda/3
+module load cudatoolkit/12.1 miniconda/3 cuda/12.1.1/cudnn/9.3
 conda activate cleanrl
 
 echo $ALG
