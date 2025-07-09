@@ -11,7 +11,7 @@ if __name__ == '__main__':
 
     res = 50
     lw_ = 3
-    max_ = 29000
+    max_ = 2900000
     fig, (ax3) = plt.subplots(1, 1, figsize=(8,5))
     #*******************************************************************************
     #####################
@@ -19,7 +19,7 @@ if __name__ == '__main__':
     #####################
     #*******************************************************************************
     
-    datadir = './data/DQN_BattleZone_ResNet.csv'
+    datadir = './data/DQN_BattleZone_ResNet2.csv'
     df = pd.read_csv(datadir)
     title = 'Global Optimality Gap on BattleZone Scaling'
     ax3.set_title(title)
@@ -94,7 +94,7 @@ if __name__ == '__main__':
 
     res = 50
     lw_ = 3
-    max_ = 22000
+    max_ = 2200000
     fig, (ax3) = plt.subplots(1, 1, figsize=(8,5))
     #*******************************************************************************
     #####################
@@ -102,7 +102,7 @@ if __name__ == '__main__':
     #####################
     #*******************************************************************************
     
-    datadir = './data/DQN_NameThisGame_ResNet.csv'
+    datadir = './data/DQN_NameThisGame_ResNet2.csv'
     df = pd.read_csv(datadir)
     title = 'Global Optimality Gap on NameThisGame Scaling'
     ax3.set_title(title)
