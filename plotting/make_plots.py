@@ -102,12 +102,13 @@ def deNan(data_):
             data_[i] = data_[i-1]
     return data_
 
-def get_data_frame(df, key, res=10, jobs=None, max=10000000000):
+def get_data_frame(df, key, res=10, jobs=None, 
+                   max=10000000000, global_key=" - global_step"):
     
 
     plot_data = []
     for i in range(len(jobs)): 
-        key__ =   jobs[i]+" - global_step"
+        key__ =   jobs[i]+global_key
         len_ = min(len(df[key__]), max)
         steps_ = range(len_)
         steps_t = deNan(df[key__].to_numpy())[:len_]
