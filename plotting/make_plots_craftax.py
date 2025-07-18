@@ -37,7 +37,7 @@ if __name__ == '__main__':
     
     plot_data = get_data_frame(df, key=" - charts/global_optimality_gap", res=res, jobs=jobs, max=max_)
 
-    label='$V^{ \hat{\pi}^{*}_{ D_{\infty} } }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$ w RND'
+    label='$V^{ \hat{\pi}^{*}_{ D_{\infty} } }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$ (best) w RND'
     plot_data = plot_data.rename(columns={0: 'Steps', 1: label})
     sns.lineplot(data=plot_data, x='Steps', y=label, ax=ax3, label=label, c=colors[label], linewidth=lw_)
     ax3.lines[-1].set_linestyle(linestyle[label])
@@ -49,7 +49,7 @@ if __name__ == '__main__':
     
     plot_data = get_data_frame(df, key=" - charts/local_optimality_gap", res=res, jobs=jobs, max=max_)
 
-    label='$V^{ \hat{\pi}^{*}_{D} }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$ w RND'
+    label='$V^{ \hat{\pi}^{*}_{D} }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$ (recent) w RND'
     plot_data = plot_data.rename(columns={0: 'Steps', 1: label})
     sns.lineplot(data=plot_data, x='Steps', y=label, ax=ax3, label=label, c=colors[label], linewidth=lw_)
     ax3.lines[-1].set_linestyle(linestyle[label])
@@ -77,7 +77,7 @@ if __name__ == '__main__':
     
     plot_data = get_data_frame(df, key=" - charts/global_optimality_gap", res=res, jobs=jobs)
 
-    label='$V^{ \hat{\pi}^{*}_{ D_{\infty} } }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$'
+    label='$V^{ \hat{\pi}^{*}_{ D_{\infty} } }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$ (best)'
     plot_data = plot_data.rename(columns={0: 'Steps', 1: label})
     sns.lineplot(data=plot_data, x='Steps', y=label, ax=ax3, label=label, c=colors[label], linewidth=lw_)
     ax3.lines[-1].set_linestyle(linestyle[label])
@@ -89,7 +89,7 @@ if __name__ == '__main__':
     
     plot_data = get_data_frame(df, key=" - charts/local_optimality_gap", res=res, jobs=jobs)
 
-    label='$V^{ \hat{\pi}^{*}_{D} }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$'
+    label='$V^{ \hat{\pi}^{*}_{D} }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$ (recent)'
     plot_data = plot_data.rename(columns={0: 'Steps', 1: label})
     sns.lineplot(data=plot_data, x='Steps', y=label, ax=ax3, label=label, c=colors[label], linewidth=lw_)
     ax3.lines[-1].set_linestyle(linestyle[label])
@@ -135,7 +135,7 @@ if __name__ == '__main__':
     
     plot_data = get_data_frame(df, key=" - charts/global_optimality_gap", res=res, jobs=jobs, max=max_)
 
-    label='$V^{ \hat{\pi}^{*}_{ D_{\infty} } }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$ w RND'
+    label='$V^{ \hat{\pi}^{*}_{ D_{\infty} } }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$ (best) w RND'
     plot_data = plot_data.rename(columns={0: 'Steps', 1: label})
     sns.lineplot(data=plot_data, x='Steps', y=label, ax=ax3, label=label, c=colors[label], linewidth=lw_)
     ax3.lines[-1].set_linestyle(linestyle[label])
@@ -147,7 +147,7 @@ if __name__ == '__main__':
     
     plot_data = get_data_frame(df, key=" - charts/local_optimality_gap", res=res, jobs=jobs, max=max_)
 
-    label='$V^{ \hat{\pi}^{*}_{D} }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$ w RND'
+    label='$V^{ \hat{\pi}^{*}_{D} }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$ (recent) w RND'
     plot_data = plot_data.rename(columns={0: 'Steps', 1: label})
     sns.lineplot(data=plot_data, x='Steps', y=label, ax=ax3, label=label, c=colors[label], linewidth=lw_)
     ax3.lines[-1].set_linestyle(linestyle[label])
@@ -170,7 +170,7 @@ if __name__ == '__main__':
     
     plot_data = get_data_frame(df, key=" - charts/global_optimality_gap", res=res, jobs=jobs)
 
-    label='$V^{ \hat{\pi}^{*}_{ D_{\infty} } }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$'
+    label='$V^{ \hat{\pi}^{*}_{ D_{\infty} } }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$ (best)'
     plot_data = plot_data.rename(columns={0: 'Steps', 1: label})
     sns.lineplot(data=plot_data, x='Steps', y=label, ax=ax3, label=label, c=colors[label], linewidth=lw_)
     ax3.lines[-1].set_linestyle(linestyle[label])
@@ -182,7 +182,7 @@ if __name__ == '__main__':
     
     plot_data = get_data_frame(df, key=" - charts/local_optimality_gap", res=res, jobs=jobs)
 
-    label='$V^{ \hat{\pi}^{*}_{D} }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$'
+    label='$V^{ \hat{\pi}^{*}_{D} }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$ (recent)'
     plot_data = plot_data.rename(columns={0: 'Steps', 1: label})
     sns.lineplot(data=plot_data, x='Steps', y=label, ax=ax3, label=label, c=colors[label], linewidth=lw_)
     ax3.lines[-1].set_linestyle(linestyle[label])
@@ -190,7 +190,7 @@ if __name__ == '__main__':
     ax3.ticklabel_format(axis= 'x', style='sci', scilimits=(0,3))
     ax3.set(ylabel='Return')
     ax3.set(xlabel='Steps')
-    ax3.legend()
+    ax3.legend(fontsize='14')
     fig.tight_layout(pad=0.5)
     #plt.subplots_adjust(bottom=.25, wspace=.25)
     plt.show()

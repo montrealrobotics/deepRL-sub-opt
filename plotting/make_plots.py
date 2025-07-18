@@ -5,45 +5,47 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns; sns.set(font_scale=1.2)
 
-colors = {'$V^{ \hat{\pi}^{*}_{ D_{\infty} } }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$': '#bf5b17',
-          '$V^{ \hat{\pi}^{*}_{D} }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$' : '#386cb0',
-          '$V^{ \hat{\pi}^{*}_{ D_{\infty} } }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$ w RND': '#B6992D',
-          '$V^{ \hat{\pi}^{*}_{D} }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$ w RND': '#7fc97f',
-          '$V^{ \hat{\pi}^{*}_{ D_{\infty} } }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$ w ResNet': "#beaed4",
-          '$V^{ \hat{\pi}^{*}_{D} }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$ w ResNet': "#ffff99",
+colors = {'$V^{ \hat{\pi}^{*}_{ D_{\infty} } }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$ (best)': '#bf5b17',
+          '$V^{ \hat{\pi}^{*}_{D} }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$ (recent)' : '#386cb0',
+          '$V^{ \hat{\pi}^{*}_{ D_{\infty} } }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$ (best) w RND': '#B6992D',
+          '$V^{ \hat{\pi}^{*}_{D} }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$ (recent) w RND': '#7fc97f',
+          '$V^{ \hat{\pi}^{*}_{ D_{\infty} } }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$ (best) w ResNet': "#beaed4",
+          '$V^{ \hat{\pi}^{*}_{D} }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$ (recent) w ResNet': "#ffff99",
 
-          '$V^{ \hat{\pi}^{\\theta} }(s_0)$ w RND': '#666666',
-          '$V^{ \hat{\pi}^{*}_{ D_{\infty} } }(s_0)$ w RND': '#B6992D',
-          '$V^{ \hat{\pi}^{*}_{D} }(s_0)$ w RND': '#7fc97f',
-          '$V^{ \hat{\pi}^{\\theta} }(s_0)$ w ResNet': "#666666",
-          '$V^{ \hat{\pi}^{*}_{ D_{\infty} } }(s_0)$ w ResNet': "#beaed4",
-          '$V^{ \hat{\pi}^{*}_{D} }(s_0)$ w ResNet': "#ffff99",
+          '$V^{ \hat{\pi}^{\\theta} }(s_0)$ (avg)' : '#666666',
+          '$V^{ \hat{\pi}^{\\theta} }(s_0)$ (deterministic)': '#f0027f',
+          '$V^{ \hat{\pi}^{*}_{ D_{\infty} } }(s_0)$ (best)': '#A0CBE8',
+          '$V^{ \hat{\pi}^{*}_{D} }(s_0)$ (recent)' : "#C36FC3",
+          '$V^{ \hat{\pi}^{*} }(s_0)$ (replay)': '#E15759',
+
+          '$V^{ \hat{\pi}^{\\theta} }(s_0)$ (avg) w RND': '#666666',
+          '$V^{ \hat{\pi}^{*}_{ D_{\infty} } }(s_0)$ (best) w RND': '#B6992D',
+          '$V^{ \hat{\pi}^{*}_{D} }(s_0)$ (recent) w RND': '#7fc97f',
+          '$V^{ \hat{\pi}^{\\theta} }(s_0)$ (avg) w ResNet': "#666666",
+          '$V^{ \hat{\pi}^{*}_{ D_{\infty} } }(s_0)$ (best) w ResNet': "#beaed4",
+          '$V^{ \hat{\pi}^{*}_{D} }(s_0)$ (recent) w ResNet': "#ffff99",
           
-          '$V^{ \hat{\pi}^{\\theta} }(s_0)$' : '#666666',
-          '$V^{ \hat{\pi}^{\\theta} }(s_0)$ deterministic': '#f0027f',
-          '$V^{ \hat{\pi}^{*}_{ D_{\infty} } }(s_0)$': '#A0CBE8',
-          '$V^{ \hat{\pi}^{*}_{D} }(s_0)$' : "#C36FC3",
-          '$V^{ \hat{\pi}^{*} }(s_0)$': '#E15759',
          }
-linestyle = {'$V^{ \hat{\pi}^{*}_{ D_{\infty} } }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$': '-',
-          '$V^{ \hat{\pi}^{*}_{D} }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$': '-',
-          '$V^{ \hat{\pi}^{*}_{ D_{\infty} } }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$ w RND': '--',
-          '$V^{ \hat{\pi}^{*}_{D} }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$ w RND': '--',
-          '$V^{ \hat{\pi}^{*}_{ D_{\infty} } }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$ w ResNet': "--",
-          '$V^{ \hat{\pi}^{*}_{D} }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$ w ResNet': "--",
+linestyle = {'$V^{ \hat{\pi}^{*}_{ D_{\infty} } }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$ (best)': '-',
+          '$V^{ \hat{\pi}^{*}_{D} }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$ (recent)': '-',
+          '$V^{ \hat{\pi}^{*}_{ D_{\infty} } }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$ (best) w RND': '--',
+          '$V^{ \hat{\pi}^{*}_{D} }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$ (recent) w RND': '--',
+          '$V^{ \hat{\pi}^{*}_{ D_{\infty} } }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$ (best) w ResNet': "--",
+          '$V^{ \hat{\pi}^{*}_{D} }(s_0) - V^{ \hat{\pi}^{\\theta} }(s_0)$ (recent) w ResNet': "--",
 
-          '$V^{ \hat{\pi}^{\\theta} }(s_0)$ w RND': '--',
-          '$V^{ \hat{\pi}^{*}_{ D_{\infty} } }(s_0)$ w RND': '--',
-          '$V^{ \hat{\pi}^{*}_{D} }(s_0)$ w RND': '--',
-          '$V^{ \hat{\pi}^{\\theta} }(s_0)$ w ResNet': '--',
-          '$V^{ \hat{\pi}^{*}_{ D_{\infty} } }(s_0)$ w ResNet': '--',
-          '$V^{ \hat{\pi}^{*}_{D} }(s_0)$ w ResNet': '--',
+          '$V^{ \hat{\pi}^{\\theta} }(s_0)$ (avg)': '-',
+          '$V^{ \hat{\pi}^{\\theta} }(s_0)$ (deterministic)': '--',
+          '$V^{ \hat{\pi}^{*}_{ D_{\infty} } }(s_0)$ (best)' : '-',
+          '$V^{ \hat{\pi}^{*}_{D} }(s_0)$ (recent)': '-',
+          '$V^{ \hat{\pi}^{*} }(s_0)$ (replay)': '--',
 
-          '$V^{ \hat{\pi}^{\\theta} }(s_0)$': '-',
-          '$V^{ \hat{\pi}^{\\theta} }(s_0)$ deterministic': '--',
-          '$V^{ \hat{\pi}^{*}_{ D_{\infty} } }(s_0)$' : '-',
-          '$V^{ \hat{\pi}^{*}_{D} }(s_0)$': '-',
-          '$V^{ \hat{\pi}^{*} }(s_0)$': '--',
+          '$V^{ \hat{\pi}^{\\theta} }(s_0)$ (avg) w RND': '--',
+          '$V^{ \hat{\pi}^{*}_{ D_{\infty} } }(s_0)$ (best) w RND': '--',
+          '$V^{ \hat{\pi}^{*}_{D} }(s_0)$ (recent) w RND': '--',
+          '$V^{ \hat{\pi}^{\\theta} }(s_0)$ (avg) w ResNet': '--',
+          '$V^{ \hat{\pi}^{*}_{ D_{\infty} } }(s_0)$ (best) w ResNet': '--',
+          '$V^{ \hat{\pi}^{*}_{D} }(s_0)$ (recent) w ResNet': '--',
+
          }
 def plotsns_smoothed(ax, s, df, label, title=None, ylabel=None, res=1):
     data = list(df[s])
@@ -103,16 +105,19 @@ def deNan(data_):
     return data_
 
 def get_data_frame(df, key, res=10, jobs=None, 
-                   max=10000000000, global_key=" - global_step"):
+                   max=10000000000, global_key=None, scale_=None):
     
-
     plot_data = []
     for i in range(len(jobs)): 
-        key__ =   jobs[i]+global_key
+        if global_key is None:
+            key__ =   jobs[i]+" - global_step"
+        else:
+            key__ =   global_key
         len_ = min(len(df[key__]), max)
         steps_ = range(len_)
         steps_t = deNan(df[key__].to_numpy())[:len_]
-        scale_ = steps_t[-1] / steps_[-1]
+        if scale_ is None:
+            scale_ = steps_t[-1] / steps_[-1]
         steps_ = np.array([np.mean(steps_[i:i+res]) for i in range(0, len(steps_)-res+1, res)])
         data_ = df[jobs[i]+key][:max].to_numpy()
         data_ = deNan(data_)
@@ -206,7 +211,7 @@ if __name__ == '__main__':
     ax3.ticklabel_format(axis= 'x', style='sci', scilimits=(0,3))
     ax3.set(ylabel='Global Optimality Gap')
     ax3.set(xlabel='Steps')
-    ax3.legend()
+    ax3.legend(fontsize='14')
     fig.tight_layout(pad=0.5)
     #plt.subplots_adjust(bottom=.25, wspace=.25)
     plt.show()
@@ -272,7 +277,7 @@ if __name__ == '__main__':
     ax3.ticklabel_format(axis= 'x', style='sci', scilimits=(0,3))
     ax3.set(ylabel='Global Optimality Gap')
     ax3.set(xlabel='Steps')
-    ax3.legend()
+    ax3.legend(fontsize='14')
     fig.tight_layout(pad=0.5)
     #plt.subplots_adjust(bottom=.25, wspace=.25)
     plt.show()

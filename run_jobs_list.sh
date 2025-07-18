@@ -47,9 +47,9 @@
 strings=(
     # "MontezumaRevengeNoFrameskip-v4"
     # "AsterixNoFrameskip-v4"
-    "SpaceInvadersNoFrameskip-v4"
+    # "SpaceInvadersNoFrameskip-v4"
     # "PitfallNoFrameskip-v4"
-    # "BattleZoneNoFrameskip-v4"
+    "BattleZoneNoFrameskip-v4"
     # "NameThisGameNoFrameskip-v4"
     # "PhoenixNoFrameskip-v4"
 )
@@ -57,8 +57,8 @@ for env in "${strings[@]}"; do
     # echo "$env"
     # sbatch --array=1-4 --export=ALL,ALG='cleanrl/dqn_atari.py',ENV_ID=$env,ARGSS='--total_timesteps 50000000' launchGPU.sh
     # sbatch --array=1-4 --export=ALL,ALG='cleanrl/dqn_atari.py',ENV_ID=$env,ARGSS='--total_timesteps 50000000 --intrinsic_rewards RND --intrinsic_reward_scale=0.2' launchGPU.sh
-    sbatch --array=1-4 --export=ALL,ALG='cleanrl/ppo_atari.py',ENV_ID=$env,ARGSS='--total_timesteps 50000000' launchGPU.sh
-    # sbatch --array=1-4 --export=ALL,ALG='cleanrl/ppo_atari.py',ENV_ID=$env,ARGSS='--total_timesteps 50000000 --intrinsic_rewards RND --intrinsic_reward_scale=0.2' launchGPU.sh
+    # sbatch --array=1-4 --export=ALL,ALG='cleanrl/ppo_atari.py',ENV_ID=$env,ARGSS='--total_timesteps 50000000' launchGPU.sh
+    sbatch --array=1-4 --export=ALL,ALG='cleanrl/ppo_atari.py',ENV_ID=$env,ARGSS='--total_timesteps 50000000 --intrinsic_rewards RND --intrinsic_reward_scale=0.2' launchGPU.sh
     # sbatch --array=1-4 --export=ALL,ALG='cleanrl/dqn_atari.py',ENV_ID=$env,ARGSS='--network_type ResNet --total_timesteps 50000000' launchGPU.sh
     # sbatch --array=1-4 --export=ALL,ALG='cleanrl/ppo_atari.py',ENV_ID=$env,ARGSS='--network_type ResNet --total_timesteps 50000000' launchGPU.sh
 done
